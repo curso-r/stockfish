@@ -1,13 +1,13 @@
 Package: stockfish
-Title: What the Package Does (One Line, Title Case)
+Title: Interface for the Stockfish chess engine
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "C.",
+           family = "Lente",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           email = "clente@curso-r.com")
+Description: This is an implementation of the UCI (Universal Chess Interface)
+    open communication protocol for chess engines that ships with Stockfish 11.
 License: MIT + file LICENSE
 Suggests: 
     testthat (>= 3.0.0),

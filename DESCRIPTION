@@ -1,5 +1,5 @@
 Package: stockfish
-Title: Interface for the Stockfish chess engine
+Title: Interface for the Stockfish Chess Engine
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "C.",
@@ -8,7 +8,7 @@ Authors@R:
            email = "clente@curso-r.com")
 Description: This is an implementation of the UCI (Universal Chess Interface)
     open communication protocol for chess engines that ships with Stockfish 11.
-License: MIT + file LICENSE
+License: GPL (>= 3)
 Suggests: 
     testthat (>= 3.0.0),
     covr

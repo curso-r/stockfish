@@ -1,0 +1,45 @@
+
+# Name of the workflow
+name: Coverage
+
+# When to run
+on:
+  push:
+    branches: master
+
+# Run covr on ubuntu-16.04
+jobs:
+  Coverage:
+    runs-on: ubuntu-16.04
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@v1
+
+      - uses: r-lib/actions/setup-pandoc@v1
+
+      - name: Cache R packages
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-r-${{ matrix.r }}-lib-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-r-${{ matrix.r }}-lib-
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get install librsvg2-dev libcurl4-openssl-dev libssl-dev libicu-dev
+
+      - name: Install R dependencies
+        run: |
+          install.packages(c("remotes"))
+          remotes::install_deps(dependencies = TRUE)
+          remotes::install_cran("covr")
+        shell: Rscript {0}
+
+      - name: Test coverage
+        run: covr::codecov()
+        shell: Rscript {0}

@@ -1,16 +1,20 @@
+
+# Name of the workflow
+name: Pages
+
+# When to run
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: master
 
-name: pkgdown
-
+# Run R-CMD-check in multiple platforms
 jobs:
-  pkgdown:
-    runs-on: macOS-latest
+  Pages:
+    runs-on: ubuntu-16.04
+
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - uses: actions/checkout@v2
 
@@ -18,21 +22,18 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v1
 
-      - name: Query dependencies
-        run: |
-          install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
-        shell: Rscript {0}
-
       - name: Cache R packages
         uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
+          key: ${{ runner.os }}-r-${{ matrix.r }}-lib-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-r-${{ matrix.r }}-lib-
 
-      - name: Install dependencies
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get install librsvg2-dev libcurl4-openssl-dev libssl-dev libicu-dev
+
+      - name: Install R dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
           install.packages("pkgdown", type = "binary")

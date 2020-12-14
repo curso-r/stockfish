@@ -7,10 +7,10 @@ on:
   push:
     branches: master
 
-# Run covr on ubuntu-16.04
+# Run covr on macos-latest
 jobs:
   Coverage:
-    runs-on: ubuntu-16.04
+    runs-on: macos-latest
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -28,10 +28,6 @@ jobs:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-r-${{ matrix.r }}-lib-${{ github.sha }}
           restore-keys: ${{ runner.os }}-r-${{ matrix.r }}-lib-
-
-      - name: Install Linux dependencies
-        if: runner.os == 'Linux'
-        run: sudo apt-get install librsvg2-dev libcurl4-openssl-dev libssl-dev libicu-dev
 
       - name: Install R dependencies
         run: |

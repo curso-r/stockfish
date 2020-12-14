@@ -7,4 +7,4 @@ PKG_LIBS=-lpthread
 .PHONY: all
 
 all:
-	$(CXX) $(OBJECTS) -o stockfish $(PKG_LIBS)
+	$(CXX) $(OBJECTS) -o stockfish $(PKG_LIBS) $(LDFLAGS)

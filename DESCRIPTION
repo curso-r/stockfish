@@ -21,4 +21,5 @@ URL: https://github.com/curso-r/stockfish
 BugReports: https://github.com/curso-r/stockfish/issues
 Imports: 
     magrittr,
-    processx
+    R6,
+    bigchess

@@ -9,3 +9,6 @@
 #' @importFrom magrittr %>%
 #' @usage lhs \%>\% rhs
 NULL
+
+# Ignore . from pipe
+globalVariables(".")

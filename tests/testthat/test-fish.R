@@ -22,8 +22,10 @@ test_that("engine works", {
   engine <- fish$new()
 
   # Test more commands
+  expect_output(print(engine), "PROCESS")
   expect_null(engine$position("e2e4", "startpos"))
   expect_equal(engine$ucinewgame(), "readyok")
+  expect_null(engine$setoption("Clear Hash"))
   expect_length(engine$go(depth = 10, movetime = 1000), 1)
   expect_true(engine$isready())
   expect_equal(engine$ucinewgame(), "readyok")

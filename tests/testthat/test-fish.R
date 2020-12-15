@@ -23,7 +23,8 @@ test_that("engine works", {
 
   # Test more commands
   expect_output(print(engine), "PROCESS")
-  expect_null(engine$position("e2e4", "startpos"))
+  tmp <- engine$position("e2e4", "startpos")
+  expect_true(is.null(tmp) || grepl("Stockfish 11", tmp))
   expect_equal(engine$ucinewgame(), "readyok")
   expect_null(engine$setoption("Clear Hash"))
   expect_length(engine$go(depth = 10, movetime = 1000), 1)

@@ -17,7 +17,7 @@ coverage](https://codecov.io/gh/curso-r/stockfish/branch/master/graph/badge.svg)
 ## Overview
 
 `{stockfish}` is an R package that implements the
-[UCI](https://wbec-ridderkerk.nl/html/UCIProtocol.html) open
+[UCI](http://wbec-ridderkerk.nl/html/UCIProtocol.html) open
 communication protocol and ships with [Stockfish
 11](https://github.com/official-stockfish/Stockfish), a very popular,
 open source, powerful chess engine written in C++.
@@ -49,11 +49,11 @@ engine <- fish$new()
 
 # Examine background process
 engine$process
-#> PROCESS 'stockfish', running, pid 162424.
+#> PROCESS 'stockfish', running, pid 164638.
 
 # Search for best move
 engine$go()
-#> [1] "bestmove e2e4 ponder d7d5"
+#> [1] "bestmove d2d4 ponder d7d5"
 
 # Setup a game from FEN
 engine$ucinewgame()
@@ -100,11 +100,11 @@ choosing and pass the executable as an argument to `fish$new()`.
 UCI (Universal Chess Interface) is an open communication protocol that
 enables chess engines to communicate with user interfaces. Strictly
 speaking, the `fish` class implements the [UCI
-protocol](https://wbec-ridderkerk.nl/html/UCIProtocol.html) as
-publicized by Stefan-Meyer Kahlen, just with a focus on the Stockfish
-engine. This means that some methods are not implemented (see **Common
-Gotchas**) and that all tests are run on Stockfish, but everything else
-should work fine with other engines.
+protocol](http://wbec-ridderkerk.nl/html/UCIProtocol.html) as publicized
+by Stefan-Meyer Kahlen, just with a focus on the Stockfish engine. This
+means that some methods are not implemented (see **Common Gotchas**) and
+that all tests are run on Stockfish, but everything else should work
+fine with other engines.
 
 The quoted text at the end of the documentation of each method was
 extracted directly from the official UCI protocol, so you can see
@@ -136,7 +136,7 @@ when trying to communicate with Stockfish. Some of them are due to
 implementation choices, but others are related to the UCI protocol
 itself. This is by no means a comprehensive list (and you should
 probably read [UCI’s
-documentation](https://wbec-ridderkerk.nl/html/UCIProtocol.html)), but
+documentation](http://wbec-ridderkerk.nl/html/UCIProtocol.html)), but
 here are a few things to look out for:
 
 -   Not every UCI method is implemented: since `{stockfish}` was made

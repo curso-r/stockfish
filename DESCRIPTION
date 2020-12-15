@@ -1,5 +1,5 @@
 Package: stockfish
-Title: Analyze Chess Games With the Stockfish Engine
+Title: Analyze Chess Games with the Stockfish Engine
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "C.",

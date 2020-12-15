@@ -31,7 +31,7 @@
 #' UCI (Universal Chess Interface) is an open communication protocol that
 #' enables chess engines to communicate with user interfaces. Strictly speaking,
 #' this class implements the
-#' [UCI protocol](https://wbec-ridderkerk.nl/html/UCIProtocol.html) as
+#' [UCI protocol](http://wbec-ridderkerk.nl/html/UCIProtocol.html) as
 #' publicized by Stefan-Meyer Kahlen, just with a focus on the Stockfish engine.
 #' This means that some methods are not implemented (see Common Gotchas) and
 #' that all tests are run on Stockfish, but everything else should work fine
@@ -64,7 +64,7 @@
 #' trying to communicate with Stockfish. Some of them are due to implementation
 #' choices, but others are related to the UCI protocol itself. This is by no
 #' means a comprehensive list (and you should probably read
-#' [UCI's documentation](https://wbec-ridderkerk.nl/html/UCIProtocol.html)), but
+#' [UCI's documentation](http://wbec-ridderkerk.nl/html/UCIProtocol.html)), but
 #' here are a few things to look out for:
 #'
 #' - Not every UCI method is implemented: since `{stockfish}` was made with
@@ -128,7 +128,7 @@ fish <- R6::R6Class(
     #' @description Send a command to be run on the engine.
     #'
     #' Every supported command is documented on the
-    #' [UCI protocol](https://wbec-ridderkerk.nl/html/UCIProtocol.html) as
+    #' [UCI protocol](http://wbec-ridderkerk.nl/html/UCIProtocol.html) as
     #' publicized by Stefan-Meyer Kahlen. Please refrain from sending more than
     #' one command per call as the engine can get confused! Also note that
     #' commands automatically get a newline (`\n`) at the end, so there is no

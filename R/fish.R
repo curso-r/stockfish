@@ -146,7 +146,9 @@ fish <- R6::R6Class(
       self$process$write_input(paste0(command, "\n"))
 
       # If command is infinite, let it run without polling
-      if (infinite) return(NULL)
+      if (infinite) {
+        return(NULL)
+      }
 
       # Read from connection until process stops processing
       output <- c()

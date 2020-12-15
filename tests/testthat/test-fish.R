@@ -11,7 +11,7 @@ test_that("engine works", {
 
   # Test commands
   expect_true(engine$isready())
-  expect_equal(engine$uci()[25], "uciok")
+  expect_equal(utils::tail(engine$uci(), 1), "uciok")
 
   # Stop engine
   engine$quit()

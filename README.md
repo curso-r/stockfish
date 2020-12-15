@@ -32,8 +32,9 @@ You can install the development version of `{stockfish}` from
 remotes::install_github("curso-r/stockfish")
 ```
 
-You can also find more (and more recent) versions of Stockfish to use at
-their [download page](https://stockfishchess.org/download/).
+You can also find more (and more recent) versions of the Stockfish
+engine to use with `{stockfish}`at their [download
+page](https://stockfishchess.org/download/).
 
 ## Example
 
@@ -49,11 +50,11 @@ engine <- fish$new()
 
 # Examine background process
 engine$process
-#> PROCESS 'stockfish', running, pid 173670.
+#> PROCESS 'stockfish', running, pid 179680.
 
 # Search for best move
 engine$go()
-#> [1] "bestmove e2e4 ponder d7d5"
+#> [1] "bestmove d2d4 ponder d7d5"
 
 # Setup a game from FEN
 engine$ucinewgame()

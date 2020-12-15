@@ -81,10 +81,6 @@ here are a few things to look out for:
 Stockfish (and mainly Stockfish 11) in mind, a couple of UCI methods that
 don't work with the engine were not implemented. They are \code{debug()} and
 \code{register()}.
-\item Don't forget to assign: if you simply run \code{fish$new()} without assigning
-it to an object, you will have to either restart the session or kill the
-Stockfish process manually in order not to have dangling engines eating up
-your RAM.
 \item Most methods return silently: since most UCI commands don't output anything
 or output boilerplate text, most methods of this class return silently. The
 exceptions are \code{run()}, \code{isready()}, \code{go()} and \code{stop()}; you can see exactly

@@ -7,11 +7,10 @@ test_that("engine works", {
   engine <- fish$new()
   expect_true(engine$process$is_alive())
   expect_gt(engine$process$get_pid(), 0)
-  expect_equal(engine$output[2], "readyok")
+  expect_true(grepl("Stockfish 11", engine$output))
 
   # Test commands
-  expect_invisible(engine$cmd("isready"))
-  expect_invisible(engine$uci())
+  expect_true(engine$isready())
   expect_equal(engine$uci()[25], "uciok")
 
   # Stop engine
@@ -23,13 +22,19 @@ test_that("engine works", {
   engine <- fish$new()
 
   # Test more commands
-  expect_invisible(engine$position(moves = "e2e4"))
-  expect_equal(engine$cmd("isready"), "readyok")
-  expect_invisible(engine$ucinewgame())
-  expect_length(engine$position(moves = "e2e4"), 0)
-  expect_length(engine$go(depth = 10), 3)
+  expect_null(engine$position("e2e4", "startpos"))
+  expect_equal(engine$ucinewgame(), "readyok")
+  expect_length(engine$go(depth = 10, movetime = 1000), 1)
   expect_true(engine$isready())
-  expect_length(engine$ucinewgame(), 0)
-  expect_length(engine$go(depth = 10, infinite = TRUE), 3)
-  expect_invisible(engine$stop())
+  expect_equal(engine$ucinewgame(), "readyok")
+  expect_null(engine$go(infinite = TRUE))
+  expect_length(engine$stop(), 1)
+
+  # Test members
+  expect_type(engine$process, "environment")
+  expect_true(grepl("bestmove", utils::tail(engine$output, 1)))
+  expect_gt(length(engine$log), 20)
+
+  # Stop and quit
+  expect_invisible(engine$quit())
 })

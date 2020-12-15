@@ -4,16 +4,16 @@
 \alias{fish}
 \title{Stockfish engine}
 \description{
-This class wraps \code{bigchess}'s functions for handling
-UCI-compatible engines. Instead of a functional workflow, this OOP approach
-allows for more persistent interations with the engine.
+Don't forget to assign!
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{process}}{Connection to \code{{processx}} process running engine}
 
-\item{\code{output}}{String vector with the latest output of the engine}
+\item{\code{output}}{String vector with the output of the last run command}
+
+\item{\code{log}}{String vector with the all outputs from the engine}
 }
 \if{html}{\out{</div>}}
 }
@@ -21,14 +21,17 @@ allows for more persistent interations with the engine.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{fish$new()}}
-\item \href{#method-cmd}{\code{fish$cmd()}}
-\item \href{#method-go}{\code{fish$go()}}
-\item \href{#method-isready}{\code{fish$isready()}}
-\item \href{#method-position}{\code{fish$position()}}
-\item \href{#method-quit}{\code{fish$quit()}}
-\item \href{#method-stop}{\code{fish$stop()}}
+\item \href{#method-run}{\code{fish$run()}}
 \item \href{#method-uci}{\code{fish$uci()}}
+\item \href{#method-isready}{\code{fish$isready()}}
+\item \href{#method-setoption}{\code{fish$setoption()}}
 \item \href{#method-ucinewgame}{\code{fish$ucinewgame()}}
+\item \href{#method-position}{\code{fish$position()}}
+\item \href{#method-go}{\code{fish$go()}}
+\item \href{#method-stop}{\code{fish$stop()}}
+\item \href{#method-ponderhit}{\code{fish$ponderhit()}}
+\item \href{#method-quit}{\code{fish$quit()}}
+\item \href{#method-print}{\code{fish$print()}}
 \item \href{#method-clone}{\code{fish$clone()}}
 }
 }
@@ -50,18 +53,228 @@ Start Stockfish engine
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-cmd"></a>}}
-\if{latex}{\out{\hypertarget{method-cmd}{}}}
-\subsection{Method \code{cmd()}}{
-Send command to Stockfish engine
+\if{html}{\out{<a id="method-run"></a>}}
+\if{latex}{\out{\hypertarget{method-run}{}}}
+\subsection{Method \code{run()}}{
+Send a command to be run on the engine.
+
+Every supported command is documented on the
+\href{https://wbec-ridderkerk.nl/html/UCIProtocol.html}{UCI protocol} as
+publicized by Stefan-Meyer Kahlen. Please refrain from sending more than
+one command per call as the engine can get confused! Also note that
+commands automatically get a newline (\verb{\\n}) at the end, so there is no
+need to append that to the string itself.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fish$cmd(command)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{fish$run(command, infinite = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{command}}{String with UCI command}
+\item{\code{command}}{A string with the command to run}
+
+\item{\code{infinite}}{Whether the command involves \verb{go infinite} (will make
+function return instantly as output should only be collected when a
+\code{stop} command is issued)}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A string vector with the output of the command or \code{NULL}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-uci"></a>}}
+\if{latex}{\out{\hypertarget{method-uci}{}}}
+\subsection{Method \code{uci()}}{
+Tell the engine to use the UCI.
+
+"Tell engine to use the uci (universal chess interface), this will be
+send once as a first command after program boot to tell the engine to
+switch to uci mode. After receiving the uci command the engine must
+identify itself with the 'id' command and sent the 'option' commands to
+tell the GUI which engine settings the engine supports if any. After that
+the engine should sent 'uciok' to acknowledge the uci mode. If no uciok
+is sent within a certain time period, the engine task will be killed by
+the GUI."
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{fish$uci()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-isready"></a>}}
+\if{latex}{\out{\hypertarget{method-isready}{}}}
+\subsection{Method \code{isready()}}{
+Ask if the engine is ready for more commands.
+
+"This is used to synchronize the engine with the GUI. When the GUI has
+sent a command or multiple commands that can take some time to complete,
+this command can be used to wait for the engine to be ready again or to
+ping the engine to find out if it is still alive. E.g. this should be
+sent after setting the path to the tablebases as this can take some time.
+This command is also required once before the engine is asked to do any
+search to wait for the engine to finish initializing. This command must
+always be answered with 'readyok' and can be sent also when the engine is
+calculating in which case the engine should also immediately answer with
+'readyok' without stopping the search."
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{fish$isready()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Boolean indicating whether the output is exactly \code{"readyok"}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-setoption"></a>}}
+\if{latex}{\out{\hypertarget{method-setoption}{}}}
+\subsection{Method \code{setoption()}}{
+Change the internal parameters of the engine. All currently
+supported options (according to Stockfish's documentation) are listed
+below, but note that \strong{those marked with an * require Stockfish 12} to
+work):
+\itemize{
+\item \code{Threads}: the number of CPU threads used for searching a position. For
+best performance, set this equal to the number of CPU cores available.
+\item \code{Hash}: the size of the hash table in MB. It is recommended to set Hash
+after setting Threads.
+\item \code{Ponder}: let Stockfish ponder its next move while the opponent is
+thinking.
+\item \code{MultiPV}: output the N best lines (principal variations, PVs) when
+searching. Leave at 1 for best performance.
+\item \verb{Use NNUE}*: toggle between the NNUE and classical evaluation functions.
+If set to "true", the network parameters must be available to load from
+file (see also EvalFile), if they are not embedded in the binary.
+\item \code{EvalFile}*: the name of the file of the NNUE evaluation parameters.
+Depending on the GUI the filename might have to include the full path to
+the folder/directory that contains the file. Other locations, such as the
+directory that contains the binary and the working directory, are also
+searched.
+\item \code{UCI_AnalyseMode}: an option handled by your GUI.
+\item \code{UCI_Chess960}: an option handled by your GUI. If true, Stockfish will
+play Chess960.
+\item \code{UCI_ShowWDL}*: tf enabled, show approximate WDL statistics as part of
+the engine output. These WDL numbers model expected game outcomes for a
+given evaluation and game ply for engine self-play at fishtest LTC
+conditions (60+0.6s per game).
+\item \code{UCI_LimitStrength}*: enable weaker play aiming for an Elo rating as set
+by UCI_Elo. This option overrides Skill Level.
+\item \code{UCI_Elo}*: if enabled by UCI_LimitStrength, aim for an engine strength
+of the given Elo. This Elo rating has been calibrated at a time control of
+60s+0.6s and anchored to CCRL 40/4.
+\item \verb{Skill Level}: lower the Skill Level in order to make Stockfish play
+weaker (see also UCI_LimitStrength). Internally, MultiPV is enabled, and
+with a certain probability depending on the Skill Level a weaker move
+will be played.
+\item \code{SyzygyPath}: path to the folders/directories storing the Syzygy
+tablebase files. Multiple directories are to be separated by ";" on
+Windows and by ":" on Unix-based operating systems. Do not use spaces
+around the ";" or ":". Example:
+\verb{C:\\tablebases\\wdl345;C:\\tablebases\\wdl6;D:\\tablebases\\dtz345;D:\\tablebases\\dtz6}.
+It is recommended to store .rtbw files on an SSD. There is no loss in
+storing the .rtbz files on a regular HD. It is recommended to verify all
+md5 checksums of the downloaded tablebase files (\verb{md5sum -c checksum.md5})
+as corruption will lead to engine crashes.
+\item \code{SyzygyProbeDepth}: minimum remaining search depth for which a position
+is probed. Set this option to a higher value to probe less aggressively
+if you experience too much slowdown (in terms of nps) due to TB probing.
+\item \code{Syzygy50MoveRule}: disable to let fifty-move rule draws detected by
+Syzygy tablebase probes count as wins or losses. This is useful for ICCF
+correspondence games.
+\item \code{SyzygyProbeLimit}: limit Syzygy tablebase probing to positions with at
+most this many pieces left (including kings and pawns).
+\item \code{Contempt}: a positive value for contempt favors middle game positions
+and avoids draws, effective for the classical evaluation only.
+\item \verb{Analysis Contempt}: by default, contempt is set to prefer the side to
+move. Set this option to "White" or "Black" to analyse with contempt for
+that side, or "Off" to disable contempt.
+\item \verb{Move Overhead}: assume a time delay of x ms due to network and GUI
+overheads. This is useful to avoid losses on time in those cases.
+\item \verb{Slow Mover}: lower values will make Stockfish take less time in games,
+higher values will make it think longer.
+\item \code{nodestime}: tells the engine to use nodes searched instead of wall time
+to account for elapsed time. Useful for engine testing.
+\item \verb{Clear Hash}: clear the hash table.
+\item \verb{Debug Log File}: write all communication to and from the engine into a
+text file.
+}
+
+"This is sent to the engine when the user wants to change the internal
+parameters of the engine. For the 'button' type no value is needed. One
+string will be sent for each parameter and this will only be sent when
+the engine is waiting. The name of the option in  should not be case
+sensitive and can inludes spaces like also the value. The substrings
+'value' and 'name' should be avoided in  and  to allow unambiguous
+parsing, for example do not use = 'draw value'. Here are some strings
+for the example below:
+\itemize{
+\item \verb{setoption name Nullmove value true\\n}
+\item \verb{setoption name Selectivity value 3\\n}
+\item \verb{setoption name Style value Risky\\n}
+\item \verb{setoption name Clear Hash\\n}
+\item \verb{setoption name NalimovPath value c:\\chess\\tb\\4;c:\\chess\\tb\\5\\n}"
+}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{fish$setoption(name, value = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{Name of the option}
+
+\item{\code{value}}{Value to set (or \code{NULL} option doesn't neet a value)}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ucinewgame"></a>}}
+\if{latex}{\out{\hypertarget{method-ucinewgame}{}}}
+\subsection{Method \code{ucinewgame()}}{
+Tell the engine that the next search will be from a
+different game.
+
+"This is sent to the engine when the next search (started with 'position'
+and 'go') will be from a different game. This can be a new game the
+engine should play or a new game it should analyse but also the next
+position from a testsuite with positions only. If the GUI hasn't sent a
+'ucinewgame' before the first 'position' command, the engine shouldn't
+expect any further ucinewgame commands as the GUI is probably not
+supporting the ucinewgame command. So the engine should not rely on this
+command even though all new GUIs should support it. As the engine's
+reaction to 'ucinewgame' can take some time the GUI should always send
+'isready' after ucinewgame to wait for the engine to finish its
+operation."
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{fish$ucinewgame()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-position"></a>}}
+\if{latex}{\out{\hypertarget{method-position}{}}}
+\subsection{Method \code{position()}}{
+Set up the position on the internal board.
+
+"Set up the position described in fenstring on the internal board and play
+the moves on the internal chess board. if the game was played  from the
+start position the string 'startpos' will be sent. Note: no 'new' command
+is needed. However, if this position is from a different game than the
+last position sent to the engine, the GUI should have sent a 'ucinewgame'
+inbetween."
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{fish$position(position = NULL, type = c("fen", "startpos"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{position}}{String with position (either a FEN or a sequence of moves
+separated by spaces)}
+
+\item{\code{type}}{Either \code{"fen"} or \code{"startpos"}, respectively}
 }
 \if{html}{\out{</div>}}
 }
@@ -70,109 +283,152 @@ Send command to Stockfish engine
 \if{html}{\out{<a id="method-go"></a>}}
 \if{latex}{\out{\hypertarget{method-go}{}}}
 \subsection{Method \code{go()}}{
-Start calculating on the current position
+Start calculating on the current position.
+
+"Start calculating on the current position set up with the 'position'
+command. There are a number of commands that can follow this command, all
+will be sent in the same string. If one command is not send its value
+should be interpreted as it would not influence the search.
+\itemize{
+\item \code{searchmoves}: restrict search to this moves only. Example: after
+'position startpos' and 'go infinite searchmoves e2e4 d2d4' the engine
+should only search the two moves e2e4 and d2d4 in the initial position.
+\item \code{ponder}: start searching in pondering mode. Do not exit the search in
+ponder mode, even if it's mate! This means that the last move sent in the
+position string is the ponder move. The engine can do what it wants to
+do, but after a 'ponderhit' command it should execute the suggested move
+to ponder on. This means that the ponder move sent by the GUI can be
+interpreted as a recommendation about which move to ponder. However, if
+the engine decides to ponder on a different move, it should not display
+any mainlines as they are likely to be misinterpreted by the GUI because
+the GUI expects the engine to ponder on the suggested move.
+\item \code{wtime}: white has x msec left on the clock.
+\item \code{btime}: black has x msec left on the clock.
+\item \code{winc}: white increment per move in mseconds if x > 0.
+\item \code{binc}: black increment per move in mseconds if x > 0.
+\item \code{movestogo}: there are x moves to the next time control, this will only
+be sent if x > 0, if you don't get this and get the wtime and btime it's
+sudden death.
+\item \code{depth}: search x plies only.
+\item \code{nodes}: search x nodes only.
+\item \code{mate}: search for a mate in x moves.
+\item \code{movetime}: search exactly x mseconds.
+\item \code{infinite}: search until the 'stop' command. Do not exit the search
+without being told so in this mode!"
+}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{fish$go(
+  searchmoves = NULL,
+  ponder = NULL,
   wtime = NULL,
   btime = NULL,
   winc = NULL,
   binc = NULL,
+  movestogo = NULL,
   depth = NULL,
-  infinite = FALSE,
-  time = 1
+  nodes = NULL,
+  mate = NULL,
+  movetime = NULL,
+  infinite = FALSE
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{wtime}}{Time (in msec) white has left on the clock}
+\item{\code{searchmoves}}{A string with the only moves (separated by spaces)
+that should be searched}
 
-\item{\code{btime}}{Time (in msec) black has left on the clock}
+\item{\code{ponder}}{Pondering move (see documentation for more information)}
 
-\item{\code{winc}}{White increment (in msec) per move if \code{wtime > 0}}
+\item{\code{wtime}}{Time (in ms) white has left on the clock (if \code{movestogo} is
+not set, it's sudden death)}
 
-\item{\code{binc}}{Black increment (in msec) per move if \code{btime > 0}}
+\item{\code{btime}}{Time (in ms) black has left on the clock (if \code{movestogo} is
+not set, it's sudden death)}
+
+\item{\code{winc}}{White increment (in ms) per move if \code{wtime > 0}}
+
+\item{\code{binc}}{Black increment (in ms) per move if \code{btime > 0}}
+
+\item{\code{movestogo}}{Number of moves to the next time control}
 
 \item{\code{depth}}{Maximum number of plies to search}
 
-\item{\code{infinite}}{Whether to search until \code{stop()} command}
+\item{\code{nodes}}{Maximum number of nodes to search}
 
-\item{\code{time}}{Timeout (in seconds) for infinite computation}
+\item{\code{mate}}{Search for a mate in this number of moves}
+
+\item{\code{movetime}}{Time (in ms) allowed for searching}
+
+\item{\code{infinite}}{Whether to search until a \code{stop} command is issued (makes
+function return instantly without any output)}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+A string with the result of search or \code{NULL} if \code{infinite == TRUE}
 }
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-isready"></a>}}
-\if{latex}{\out{\hypertarget{method-isready}{}}}
-\subsection{Method \code{isready()}}{
-Wait for the engine to be ready again
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fish$isready()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-position"></a>}}
-\if{latex}{\out{\hypertarget{method-position}{}}}
-\subsection{Method \code{position()}}{
-Set up the position on the internal board
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fish$position(moves = NULL, startpos = TRUE, fen = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{moves}}{String with LAN moves}
-
-\item{\code{startpos}}{Whether starting from start position}
-
-\item{\code{fen}}{String with FEN board}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-quit"></a>}}
-\if{latex}{\out{\hypertarget{method-quit}{}}}
-\subsection{Method \code{quit()}}{
-Kill Stockfish engine
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fish$quit()}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-stop"></a>}}
 \if{latex}{\out{\hypertarget{method-stop}{}}}
 \subsection{Method \code{stop()}}{
 Stop calculating as soon as possible
+
+"Stop calculating as soon as possible, don't forget the 'bestmove' and
+possibly the 'ponder' token when finishing the search"
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{fish$stop()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+A string with the result of search or \code{NULL} if there was no
+search underway
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-uci"></a>}}
-\if{latex}{\out{\hypertarget{method-uci}{}}}
-\subsection{Method \code{uci()}}{
-Tell engine to use the UCI
+\if{html}{\out{<a id="method-ponderhit"></a>}}
+\if{latex}{\out{\hypertarget{method-ponderhit}{}}}
+\subsection{Method \code{ponderhit()}}{
+Tell the engine that the user has played the expected move.
+
+"The user has played the expected move. This will be sent if the engine
+was told to ponder on the same move the user has played. The engine
+should continue searching but switch from pondering to normal search."
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fish$uci()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{fish$ponderhit()}\if{html}{\out{</div>}}
 }
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ucinewgame"></a>}}
-\if{latex}{\out{\hypertarget{method-ucinewgame}{}}}
-\subsection{Method \code{ucinewgame()}}{
-Tell the next search will be from a different game
+\if{html}{\out{<a id="method-quit"></a>}}
+\if{latex}{\out{\hypertarget{method-quit}{}}}
+\subsection{Method \code{quit()}}{
+Kill the engine
+
+"Quit the program as soon as possible"
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fish$ucinewgame()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{fish$quit()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
+\subsection{Method \code{print()}}{
+Print information about engine process
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{fish$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Arguments passed on to \code{print()}}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

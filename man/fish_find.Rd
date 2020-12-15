@@ -2,10 +2,10 @@
 % Please edit documentation in R/fish.R
 \name{fish_find}
 \alias{fish_find}
-\title{Find bundled Stockfish}
+\title{Find bundled Stockfish executable}
 \usage{
 fish_find()
 }
 \description{
-Find bundled Stockfish
+Find bundled Stockfish executable
 }

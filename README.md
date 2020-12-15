@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# stockfish
+# stockfish <a href='https://www.curso-r.com/'><img src='man/figures/logo.png' align="right" height="139" /></a>
 
 <!-- badges: start -->
 
@@ -49,7 +49,7 @@ engine <- fish$new()
 
 # Examine background process
 engine$process
-#> PROCESS 'stockfish', running, pid 148341.
+#> PROCESS 'stockfish', running, pid 162424.
 
 # Search for best move
 engine$go()

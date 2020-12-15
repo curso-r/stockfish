@@ -1,7 +1,91 @@
 
 #' Stockfish engine
 #'
-#' @description Don't forget to assign!
+#' @description This class represents a Stockfish engine, allowing the user to
+#' send commands and receive outputs according to the UCI protocol. In short, a
+#' `fish` object, when created, spawns a detached Stockfish process and pipes
+#' into its stdin and stdout.
+#'
+#' For more information, see the full documentation by running `?fish`.
+#'
+#' @section Bundled Stockfish:
+#' This package comes bundled with
+#' [Stockfish](https://github.com/official-stockfish/Stockfish), a very popular,
+#' open source, powerful chess engine written in C++. It can achieve an ELO of
+#' 3516, runs on Windows, macOS, Linux, iOS and Android, and can be compiled in
+#' less than a minute.
+#'
+#' When installing `{stockfish}` (lower case), Stockfish's (upper case) source
+#' code is compiled and the resulting executable is stored with your R packages.
+#' This is not a system-wide installation! You don't have to give it
+#' administrative privileges to run or even worry about any additional software.
+#'
+#' The only downside is that the bundled version of the engine is Stockfish 11,
+#' not the most recent Stockfish 12. This is because the 12th version needs
+#' additional downloads, which would dramatically increase the installation time.
+#' If you want to, you can [download](https://stockfishchess.org/download/) the
+#' version of your choosing and pass the executable as an argument to
+#' `fish$new()`.
+#'
+#' @section UCI Protocol:
+#' UCI (Universal Chess Interface) is an open communication protocol that
+#' enables chess engines to communicate with user interfaces. Strictly speaking,
+#' this class implements the
+#' [UCI protocol](https://wbec-ridderkerk.nl/html/UCIProtocol.html) as
+#' publicized by Stefan-Meyer Kahlen, just with a focus on the Stockfish engine.
+#' This means that some methods are not implemented (see Common Gotchas) and
+#' that all tests are run on Stockfish, but everything else should work fine
+#' with other engines.
+#'
+#' The quoted text at the end of the documentation of each method was extracted
+#' directly from the official UCI protocol, so you can see exactly what that
+#' command can do. In general, the commands are pretty self-explanatory, except
+#' for long algebraic notation (LAN), the move notation used by UCI. In this
+#' notation, moves are recorded using the starting and ending positions of each
+#' piece, e.g. e2e4, e7e5, e1g1 (white short castling), e7e8q (for promotion),
+#' 0000 (nullmove).
+#'
+#' @section Implementation:
+#' All the heavy lifting of this class is done by the `{processx}` package. The
+#' Stockfish process is created with `processx::process$new` and IO is done with
+#' `write_input()` and `read_output()`. An important aspect of the communication
+#' protocol of any UCI engine is waiting for replies, and here this is done
+#' with a loop that queries the process with `poll_io()` and stops once the
+#' output comes back empty.
+#'
+#' Before implementing the UCI protocol manually, this package used
+#' `{bigchess}`. It is a great package created by
+#' [@@rosawojciech](https://github.com/rosawojciech), but it has some
+#' dependencies that are beyond the scope of this package and ultimately I
+#' wanted more control over the API (e.g. using `{R6}`).
+#'
+#' @section Common Gotchas:
+#' This class has some specifics that the user should keep in mind when
+#' trying to communicate with Stockfish. Some of them are due to implementation
+#' choices, but others are related to the UCI protocol itself. This is by no
+#' means a comprehensive list (and you should probably read
+#' [UCI's documentation](https://wbec-ridderkerk.nl/html/UCIProtocol.html)), but
+#' here are a few things to look out for:
+#'
+#' - Not every UCI method is implemented: since `{stockfish}` was made with
+#' Stockfish (and mainly Stockfish 11) in mind, a couple of UCI methods that
+#' don't work with the engine were not implemented. They are `debug()` and
+#' `register()`.
+#' - Don't forget to assign: if you simply run `fish$new()` without assigning
+#' it to an object, you will have to either restart the session or kill the
+#' Stockfish process manually in order not to have dangling engines eating up
+#' your RAM.
+#' - Most methods return silently: since most UCI commands don't output anything
+#' or output boilerplate text, most methods of this class return silently. The
+#' exceptions are `run()`, `isready()`, `go()` and `stop()`; you can see exactly
+#' what they return by reading their documentations.
+#' - Not every Stockfish option will work: at least when using the bundled
+#' version of Stockfish, not every documented option will work with `setoption()`.
+#' This happens because, as described above, this package comes with Stockfish
+#' 11, which is not the most recent version. Options that will not work are
+#' labeled with an asterisk.
+#' - Times are in milliseconds: unlike most R functions, every method that takes
+#' a time interval expects them in milliseconds, not seconds.
 #'
 #' @export
 fish <- R6::R6Class(
@@ -10,16 +94,21 @@ fish <- R6::R6Class(
   # Public methods
   public = list(
 
-    #' @field process Connection to `{processx}` process running engine
+    #' @field process Connection to `{processx}` process running the engine
     process = NULL,
 
-    #' @field output String vector with the output of the last run command
+    #' @field output String vector with the output of the last command
     output = NULL,
 
     #' @field log String vector with the all outputs from the engine
     log = NULL,
 
     #' @description Start Stockfish engine
+    #'
+    #' By default, this function uses the included version of Stockfish. If
+    #' you want to run a more recent version, you can pass its executable as
+    #' an argument. For more information, see the Bundled Stockfish section of
+    #' this documentation.
     #'
     #' @param path Path to Stockfish executable (defaults to bundled version)
     initialize = function(path = NULL) {
@@ -34,9 +123,6 @@ fish <- R6::R6Class(
       self$process$poll_io(100)
       self$output <- self$process$read_output()
       self$log <- self$output
-
-      # Give user some feedback
-      return(self$process)
     },
 
     #' @description Send a command to be run on the engine.
@@ -51,7 +137,7 @@ fish <- R6::R6Class(
     #' @param command A string with the command to run
     #' @param infinite Whether the command involves `go infinite` (will make
     #' function return instantly as output should only be collected when a
-    #' `stop` command is issued)
+    #' `stop()` command is issued)
     #'
     #' @return A string vector with the output of the command or `NULL`
     run = function(command, infinite = FALSE) {
@@ -189,7 +275,7 @@ fish <- R6::R6Class(
     #' parameters of the engine. For the 'button' type no value is needed. One
     #' string will be sent for each parameter and this will only be sent when
     #' the engine is waiting. The name of the option in  should not be case
-    #' sensitive and can inludes spaces like also the value. The substrings
+    #' sensitive and can includes spaces like also the value. The substrings
     #' 'value' and 'name' should be avoided in  and  to allow unambiguous
     #' parsing, for example do not use = 'draw value'. Here are some strings
     #' for the example below:
@@ -201,7 +287,7 @@ fish <- R6::R6Class(
     #' - `setoption name NalimovPath value c:\chess\tb\4;c:\chess\tb\5\n`"
     #'
     #' @param name Name of the option
-    #' @param value Value to set (or `NULL` option doesn't neet a value)
+    #' @param value Value to set (or `NULL` if option doesn't need a value)
     setoption = function(name, value = NULL) {
 
       # Build command
@@ -231,7 +317,9 @@ fish <- R6::R6Class(
       invisible(self$run("ucinewgame\nisready"))
     },
 
-    #' @description Set up the position on the internal board.
+    #' @description Set up the position on the internal board. When passing a
+    #' sequence of moves, use long algebraic notation (LAN) as described in the
+    #' UCI Protocol section of this documentation.
     #'
     #' "Set up the position described in fenstring on the internal board and play
     #' the moves on the internal chess board. if the game was played  from the
@@ -283,7 +371,7 @@ fish <- R6::R6Class(
     #'
     #' @param searchmoves A string with the only moves (separated by spaces)
     #' that should be searched
-    #' @param ponder Pondering move (see documentation for more information)
+    #' @param ponder Pondering move (see UCI documentation for more information)
     #' @param wtime Time (in ms) white has left on the clock (if `movestogo` is
     #' not set, it's sudden death)
     #' @param btime Time (in ms) black has left on the clock (if `movestogo` is
@@ -295,10 +383,10 @@ fish <- R6::R6Class(
     #' @param nodes Maximum number of nodes to search
     #' @param mate Search for a mate in this number of moves
     #' @param movetime Time (in ms) allowed for searching
-    #' @param infinite Whether to search until a `stop` command is issued (makes
-    #' function return instantly without any output)
+    #' @param infinite Whether to only stop searching when a `stop()` command is
+    #' issued (makes function return instantly without any output)
     #'
-    #' @return A string with the result of search or `NULL` if `infinite == TRUE`
+    #' @return A string with result of the search or `NULL` if `infinite == TRUE`
     go = function(searchmoves = NULL, ponder = NULL, wtime = NULL, btime = NULL,
                   winc = NULL, binc = NULL, movestogo = NULL, depth = NULL,
                   nodes = NULL, mate = NULL, movetime = NULL, infinite = FALSE) {
@@ -337,10 +425,10 @@ fish <- R6::R6Class(
       return(utils::tail(self$run(command, infinite), 1))
     },
 
-    #' @description Stop calculating as soon as possible
+    #' @description Stop calculating as soon as possible.
     #'
     #' "Stop calculating as soon as possible, don't forget the 'bestmove' and
-    #' possibly the 'ponder' token when finishing the search"
+    #' possibly the 'ponder' token when finishing the search."
     #'
     #' @return A string with the result of search or `NULL` if there was no
     #' search underway
@@ -359,13 +447,13 @@ fish <- R6::R6Class(
 
     #' @description Kill the engine
     #'
-    #' "Quit the program as soon as possible"
+    #' "Quit the program as soon as possible."
     quit = function() {
       self$run("quit")
       invisible(TRUE)
     },
 
-    #' @description Print information about engine process
+    #' @description Print information about engine process.
     #'
     #' @param ... Arguments passed on to `print()`
     print = function(...) {
@@ -375,6 +463,10 @@ fish <- R6::R6Class(
 )
 
 #' Find bundled Stockfish executable
+#'
+#' This package comes bundled with Stockfish 11, an open source, powerful UCI
+#' chess engine. For more information about what Stockfish is, see the full
+#' documentation of this package by running `?fish`.
 #'
 #' @export
 fish_find <- function() {

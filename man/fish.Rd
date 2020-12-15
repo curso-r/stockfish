@@ -4,14 +4,107 @@
 \alias{fish}
 \title{Stockfish engine}
 \description{
-Don't forget to assign!
+This class represents a Stockfish engine, allowing the user to
+send commands and receive outputs according to the UCI protocol. In short, a
+\code{fish} object, when created, spawns a detached Stockfish process and pipes
+into its stdin and stdout.
+
+For more information, see the full documentation by running \code{?fish}.
 }
+\section{Bundled Stockfish}{
+
+This package comes bundled with
+\href{https://github.com/official-stockfish/Stockfish}{Stockfish}, a very popular,
+open source, powerful chess engine written in C++. It can achieve an ELO of
+3516, runs on Windows, macOS, Linux, iOS and Android, and can be compiled in
+less than a minute.
+
+When installing \code{{stockfish}} (lower case), Stockfish's (upper case) source
+code is compiled and the resulting executable is stored with your R packages.
+This is not a system-wide installation! You don't have to give it
+administrative privileges to run or even worry about any additional software.
+
+The only downside is that the bundled version of the engine is Stockfish 11,
+not the most recent Stockfish 12. This is because the 12th version needs
+additional downloads, which would dramatically increase the installation time.
+If you want to, you can \href{https://stockfishchess.org/download/}{download} the
+version of your choosing and pass the executable as an argument to
+\code{fish$new()}.
+}
+
+\section{UCI Protocol}{
+
+UCI (Universal Chess Interface) is an open communication protocol that
+enables chess engines to communicate with user interfaces. Strictly speaking,
+this class implements the
+\href{https://wbec-ridderkerk.nl/html/UCIProtocol.html}{UCI protocol} as
+publicized by Stefan-Meyer Kahlen, just with a focus on the Stockfish engine.
+This means that some methods are not implemented (see Common Gotchas) and
+that all tests are run on Stockfish, but everything else should work fine
+with other engines.
+
+The quoted text at the end of the documentation of each method was extracted
+directly from the official UCI protocol, so you can see exactly what that
+command can do. In general, the commands are pretty self-explanatory, except
+for long algebraic notation (LAN), the move notation used by UCI. In this
+notation, moves are recorded using the starting and ending positions of each
+piece, e.g. e2e4, e7e5, e1g1 (white short castling), e7e8q (for promotion),
+0000 (nullmove).
+}
+
+\section{Implementation}{
+
+All the heavy lifting of this class is done by the \code{{processx}} package. The
+Stockfish process is created with \code{processx::process$new} and IO is done with
+\code{write_input()} and \code{read_output()}. An important aspect of the communication
+protocol of any UCI engine is waiting for replies, and here this is done
+with a loop that queries the process with \code{poll_io()} and stops once the
+output comes back empty.
+
+Before implementing the UCI protocol manually, this package used
+\code{{bigchess}}. It is a great package created by
+\href{https://github.com/rosawojciech}{@rosawojciech}, but it has some
+dependencies that are beyond the scope of this package and ultimately I
+wanted more control over the API (e.g. using \code{{R6}}).
+}
+
+\section{Common Gotchas}{
+
+This class has some specifics that the user should keep in mind when
+trying to communicate with Stockfish. Some of them are due to implementation
+choices, but others are related to the UCI protocol itself. This is by no
+means a comprehensive list (and you should probably read
+\href{https://wbec-ridderkerk.nl/html/UCIProtocol.html}{UCI's documentation}), but
+here are a few things to look out for:
+\itemize{
+\item Not every UCI method is implemented: since \code{{stockfish}} was made with
+Stockfish (and mainly Stockfish 11) in mind, a couple of UCI methods that
+don't work with the engine were not implemented. They are \code{debug()} and
+\code{register()}.
+\item Don't forget to assign: if you simply run \code{fish$new()} without assigning
+it to an object, you will have to either restart the session or kill the
+Stockfish process manually in order not to have dangling engines eating up
+your RAM.
+\item Most methods return silently: since most UCI commands don't output anything
+or output boilerplate text, most methods of this class return silently. The
+exceptions are \code{run()}, \code{isready()}, \code{go()} and \code{stop()}; you can see exactly
+what they return by reading their documentations.
+\item Not every Stockfish option will work: at least when using the bundled
+version of Stockfish, not every documented option will work with \code{setoption()}.
+This happens because, as described above, this package comes with Stockfish
+11, which is not the most recent version. Options that will not work are
+labeled with an asterisk.
+\item Times are in milliseconds: unlike most R functions, every method that takes
+a time interval expects them in milliseconds, not seconds.
+}
+}
+
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{process}}{Connection to \code{{processx}} process running engine}
+\item{\code{process}}{Connection to \code{{processx}} process running the engine}
 
-\item{\code{output}}{String vector with the output of the last run command}
+\item{\code{output}}{String vector with the output of the last command}
 
 \item{\code{log}}{String vector with the all outputs from the engine}
 }
@@ -40,6 +133,11 @@ Don't forget to assign!
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 Start Stockfish engine
+
+By default, this function uses the included version of Stockfish. If
+you want to run a more recent version, you can pass its executable as
+an argument. For more information, see the Bundled Stockfish section of
+this documentation.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{fish$new(path = NULL)}\if{html}{\out{</div>}}
 }
@@ -75,7 +173,7 @@ need to append that to the string itself.
 
 \item{\code{infinite}}{Whether the command involves \verb{go infinite} (will make
 function return instantly as output should only be collected when a
-\code{stop} command is issued)}
+\code{stop()} command is issued)}
 }
 \if{html}{\out{</div>}}
 }
@@ -204,7 +302,7 @@ text file.
 parameters of the engine. For the 'button' type no value is needed. One
 string will be sent for each parameter and this will only be sent when
 the engine is waiting. The name of the option in  should not be case
-sensitive and can inludes spaces like also the value. The substrings
+sensitive and can includes spaces like also the value. The substrings
 'value' and 'name' should be avoided in  and  to allow unambiguous
 parsing, for example do not use = 'draw value'. Here are some strings
 for the example below:
@@ -224,7 +322,7 @@ for the example below:
 \describe{
 \item{\code{name}}{Name of the option}
 
-\item{\code{value}}{Value to set (or \code{NULL} option doesn't neet a value)}
+\item{\code{value}}{Value to set (or \code{NULL} if option doesn't need a value)}
 }
 \if{html}{\out{</div>}}
 }
@@ -256,7 +354,9 @@ operation."
 \if{html}{\out{<a id="method-position"></a>}}
 \if{latex}{\out{\hypertarget{method-position}{}}}
 \subsection{Method \code{position()}}{
-Set up the position on the internal board.
+Set up the position on the internal board. When passing a
+sequence of moves, use long algebraic notation (LAN) as described in the
+UCI Protocol section of this documentation.
 
 "Set up the position described in fenstring on the internal board and play
 the moves on the internal chess board. if the game was played  from the
@@ -339,7 +439,7 @@ without being told so in this mode!"
 \item{\code{searchmoves}}{A string with the only moves (separated by spaces)
 that should be searched}
 
-\item{\code{ponder}}{Pondering move (see documentation for more information)}
+\item{\code{ponder}}{Pondering move (see UCI documentation for more information)}
 
 \item{\code{wtime}}{Time (in ms) white has left on the clock (if \code{movestogo} is
 not set, it's sudden death)}
@@ -361,23 +461,23 @@ not set, it's sudden death)}
 
 \item{\code{movetime}}{Time (in ms) allowed for searching}
 
-\item{\code{infinite}}{Whether to search until a \code{stop} command is issued (makes
-function return instantly without any output)}
+\item{\code{infinite}}{Whether to only stop searching when a \code{stop()} command is
+issued (makes function return instantly without any output)}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A string with the result of search or \code{NULL} if \code{infinite == TRUE}
+A string with result of the search or \code{NULL} if \code{infinite == TRUE}
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-stop"></a>}}
 \if{latex}{\out{\hypertarget{method-stop}{}}}
 \subsection{Method \code{stop()}}{
-Stop calculating as soon as possible
+Stop calculating as soon as possible.
 
 "Stop calculating as soon as possible, don't forget the 'bestmove' and
-possibly the 'ponder' token when finishing the search"
+possibly the 'ponder' token when finishing the search."
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{fish$stop()}\if{html}{\out{</div>}}
 }
@@ -407,7 +507,7 @@ should continue searching but switch from pondering to normal search."
 \subsection{Method \code{quit()}}{
 Kill the engine
 
-"Quit the program as soon as possible"
+"Quit the program as soon as possible."
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{fish$quit()}\if{html}{\out{</div>}}
 }
@@ -417,7 +517,7 @@ Kill the engine
 \if{html}{\out{<a id="method-print"></a>}}
 \if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
-Print information about engine process
+Print information about engine process.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{fish$print(...)}\if{html}{\out{</div>}}
 }

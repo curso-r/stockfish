@@ -7,5 +7,7 @@
 fish_find()
 }
 \description{
-Find bundled Stockfish executable
+This package comes bundled with Stockfish 11, an open source, powerful UCI
+chess engine. For more information about what Stockfish is, see the full
+documentation of this package by running \code{?fish}.
 }

@@ -49,7 +49,7 @@ engine <- fish$new()
 
 # Examine background process
 engine$process
-#> PROCESS 'stockfish', running, pid 164638.
+#> PROCESS 'stockfish', running, pid 173149.
 
 # Search for best move
 engine$go()
@@ -143,11 +143,6 @@ here are a few things to look out for:
     with Stockfish (and mainly Stockfish 11) in mind, a couple of UCI
     methods that don’t work with the engine were not implemented. They
     are `debug()` and `register()`.
-
--   Don’t forget to assign: if you simply run `fish$new()` without
-    assigning it to an object, you will have to either restart the
-    session or kill the Stockfish process manually in order not to have
-    dangling engines eating up your RAM.
 
 -   Most methods return silently: since most UCI commands don’t output
     anything or output boilerplate text, most methods return silently.

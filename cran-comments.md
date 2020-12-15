@@ -18,3 +18,11 @@
 * Checking installed package size ... NOTE
 
   * Installed size is 6.9Mb
+
+## Justification for installed size
+
+* This package compiles and install a binary for the Stockfish engine according
+to the recommendations outlined at
+[Writing R Extensions](https://cran.r-project.org/doc/manuals/R-exts.html#Package-subdirectories).
+Since we shouldn't use any extra flags, the final size of the binary is going to
+be few Mb.

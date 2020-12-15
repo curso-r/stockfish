@@ -49,11 +49,11 @@ engine <- fish$new()
 
 # Examine background process
 engine$process
-#> PROCESS 'stockfish', running, pid 173149.
+#> PROCESS 'stockfish', running, pid 173670.
 
 # Search for best move
 engine$go()
-#> [1] "bestmove d2d4 ponder d7d5"
+#> [1] "bestmove e2e4 ponder d7d5"
 
 # Setup a game from FEN
 engine$ucinewgame()
@@ -125,7 +125,7 @@ replies, and here this is done with a loop that queries the process with
 
 Before implementing the UCI protocol manually, this package used
 `{bigchess}`. It is a great package created by
-\[@rosawojciech\](<https://github.com/rosawojciech>), but it has some
+[@rosawojciech](https://github.com/rosawojciech), but it has some
 dependencies that are beyond the scope of this package and ultimately I
 wanted more control over the API (e.g. using `{R6}`).
 

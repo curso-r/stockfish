@@ -129,7 +129,7 @@ output comes back empty.
 
 Before implementing the UCI protocol manually, this package used
 `{bigchess}`. It is a great package created by
-[@rosawojciech](https://github.com/rosawojciech), but it has some
+[\@rosawojciech](https://github.com/rosawojciech), but it has some
 dependencies that are beyond the scope of this package and ultimately I
 wanted more control over the API (e.g. using `{R6}`).
 

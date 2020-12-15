@@ -33,7 +33,7 @@ test_that("engine works", {
   # Test members
   expect_type(engine$process, "environment")
   expect_true(grepl("bestmove", utils::tail(engine$output, 1)))
-  expect_gt(length(engine$log), 20)
+  expect_gt(length(engine$log), 10)
 
   # Stop and quit
   expect_invisible(engine$quit())

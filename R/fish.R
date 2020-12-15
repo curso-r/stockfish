@@ -160,8 +160,11 @@ fish <- R6::R6Class(
           break()
         }
 
+        # Choose separator based on OS
+        if (.Platform$OS.type == "windows") sep <- "\r\n" else sep <- "\n"
+
         # Parse output
-        output <- c(output, strsplit(tmp, "\n")[[1]])
+        output <- c(output, strsplit(tmp, sep, perl = TRUE)[[1]])
       }
 
       # Update output field and the log

@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/stockfish)](https://CRAN.R-project.org/package=stockfish)
 [![Codecov test
@@ -50,7 +50,7 @@ engine <- fish$new()
 
 # Examine background process
 engine$process
-#> PROCESS 'stockfish', running, pid 179680.
+#> PROCESS 'stockfish', running, pid 224021.
 
 # Search for best move
 engine$go()

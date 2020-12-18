@@ -5,13 +5,13 @@
 
 <!-- badges: start -->
 
-[![Lifecycle:
-maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/stockfish)](https://CRAN.R-project.org/package=stockfish)
 [![Codecov test
 coverage](https://codecov.io/gh/curso-r/stockfish/branch/master/graph/badge.svg)](https://codecov.io/gh/curso-r/stockfish?branch=master)
 [![R-CMD-check](https://github.com/curso-r/stockfish/workflows/R-CMD-check/badge.svg)](https://github.com/curso-r/stockfish/actions)
+[![Lifecycle:
+maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 <!-- badges: end -->
 
 ## Overview
@@ -24,8 +24,14 @@ open source, powerful chess engine written in C++.
 
 ## Installation
 
-You can install the development version of `{stockfish}` from
-[GitHub](https://github.com/curso-r/stockfish) with:
+Install the released version of `{stockfish}` from CRAN:
+
+``` r
+install.packages("stockfish")
+```
+
+Or install the development version from
+[GitHub](https://github.com/curso-r/stockfish):
 
 ``` r
 # install.packages("remotes")
@@ -50,7 +56,7 @@ engine <- fish$new()
 
 # Examine background process
 engine$process
-#> PROCESS 'stockfish', running, pid 224021.
+#> PROCESS 'stockfish', running, pid 277656.
 
 # Search for best move
 engine$go()

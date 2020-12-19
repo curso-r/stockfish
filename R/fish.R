@@ -467,7 +467,10 @@ fish <- R6::R6Class(
 
     # @description Kill engine when object is collected
     finalize = function() {
-      self$run("quit")
+      tryCatch(
+        self$run("quit"),
+        error = function(err) { }
+      )
     }
   )
 )

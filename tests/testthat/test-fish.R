@@ -15,6 +15,8 @@ test_that("engine works", {
 
   # Stop engine
   engine$quit()
+  # It might take a sec to quit
+  engine$process$wait(3000)
   expect_false(engine$process$is_alive())
   expect_error(engine$process$get_status())
 

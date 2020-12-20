@@ -494,3 +494,10 @@ fish_find <- function() {
 
   return(file)
 }
+
+# Work around R CMD check issue:
+# Namespaces in Imports field not imported from
+workaround <- function() {
+  processx::process
+  R6::R6Class
+}

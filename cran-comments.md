@@ -13,7 +13,15 @@
   
   * New submission
   
-  * Possibly mis-spelled words in DESCRIPTION: Stockfish (2:37, 10:30) UCI (9:39)
+  * Package was archived on CRAN
+  
+  * Possibly mis-spelled words in DESCRIPTION:
+      Stockfish (2:37, 10:30)
+      UCI (9:39)
+  
+  * CRAN repository db overrides:
+      X-CRAN-Comment: Archived on 2020-12-19 for policy violation.
+      On cross-platform portable code.
 
 * Checking installed package size ... NOTE
 

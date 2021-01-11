@@ -6,9 +6,9 @@ Authors@R:
            family = "Lente",
            role = c("aut", "cre"),
            email = "clente@curso-r.com")
-Description: An implementation of the UCI open communication
-    protocol that ships with Stockfish 11, a very popular, open source,
-    powerful chess engine written in C++.
+Description: An implementation of the UCI open communication protocol that ships
+    with 'Stockfish 11' <https://stockfishchess.org/>, a very popular, open
+    source, powerful chess engine written in C++.
 License: GPL (>= 3)
 URL: https://github.com/curso-r/stockfish
 BugReports: https://github.com/curso-r/stockfish/issues

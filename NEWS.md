@@ -1,5 +1,6 @@
 # stockfish (development version)
 
+* Added `{Rcpp}` in order to force GCC. 
 * Updated Description to include link to Stockfish.
 * Added `tryCatch()` to finalizer.
 * Added `workaround()` function to pass "not imported from" check.

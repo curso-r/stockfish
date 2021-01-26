@@ -368,7 +368,7 @@ inline Square msb(Bitboard b) {
 
 #else  // Compiler is neither GCC nor MSVC compatible
 
-#error "Compiler not supported."
+#error "Compiler not supported! Must be either GCC or MSVC compatible."
 
 #endif
 

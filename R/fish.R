@@ -503,5 +503,4 @@ fish_find <- function() {
 workaround <- function() {
   processx::process
   R6::R6Class
-  Rcpp::sourceCpp
 }

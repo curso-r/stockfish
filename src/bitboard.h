@@ -368,7 +368,7 @@ inline Square msb(Bitboard b) {
 
 #else  // Compiler is neither GCC nor MSVC compatible
 
-#error "Compiler not supported! Must be either GCC or MSVC compatible."
+#error "The Stockfish engine requires either GCC or MSVC compatible compilers and this R package only works with GCC or clang. As of yet, Solaris and Oracle compilers are not supported."
 
 #endif
 

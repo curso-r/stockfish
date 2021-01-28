@@ -11,7 +11,7 @@ status](https://www.r-pkg.org/badges/version/stockfish)](https://CRAN.R-project.
 coverage](https://codecov.io/gh/curso-r/stockfish/branch/master/graph/badge.svg)](https://codecov.io/gh/curso-r/stockfish?branch=master)
 [![R-CMD-check](https://github.com/curso-r/stockfish/workflows/R-CMD-check/badge.svg)](https://github.com/curso-r/stockfish/actions)
 [![Lifecycle:
-maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 <!-- badges: end -->
 
 ## Overview
@@ -56,11 +56,11 @@ engine <- fish$new()
 
 # Examine background process
 engine$process
-#> PROCESS 'stockfish', running, pid 277656.
+#> PROCESS 'stockfish', running, pid 43041.
 
 # Search for best move
 engine$go()
-#> [1] "bestmove d2d4 ponder d7d5"
+#> [1] "bestmove c2c3 ponder b8c6"
 
 # Setup a game from FEN
 engine$ucinewgame()

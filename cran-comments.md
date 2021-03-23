@@ -16,7 +16,6 @@
   * Package was archived on CRAN
   
   * Possibly mis-spelled words in DESCRIPTION:
-      Stockfish (2:37, 10:30)
       UCI (9:39)
   
   * CRAN repository db overrides:

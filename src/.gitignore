@@ -1,3 +1,4 @@
 stockfish
+Makevars
 *.o
 *.so

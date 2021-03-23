@@ -1,5 +1,6 @@
 # stockfish (development version)
 
+* Updated compilation on Solaris.
 * Updated Description to include link to Stockfish.
 * Added `tryCatch()` to finalizer.
 * Added `workaround()` function to pass "not imported from" check.

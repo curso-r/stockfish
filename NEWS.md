@@ -1,4 +1,4 @@
-# stockfish (development version)
+# stockfish 0.1.1
 
 * Updated compilation on Solaris.
 * Updated Description to include link to Stockfish.

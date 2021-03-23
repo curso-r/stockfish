@@ -1,4 +1,9 @@
 library(testthat)
 library(stockfish)
 
-test_check("stockfish")
+is_solaris <- function() {
+  grepl('SunOS',Sys.info()['sysname'])
+}
+
+if (!is_solaris())
+  test_check("stockfish")

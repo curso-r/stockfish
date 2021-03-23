@@ -1,5 +1,5 @@
 CXX=g++
-CPPFILES=dummy.cpp
+CPPFILES=@SRC@
 SOURCES=$(CPPFILES)
 OBJECTS=$(CFILES:.c=.o) $(CPPFILES:.cpp=.o)
 PKG_LIBS=-lpthread

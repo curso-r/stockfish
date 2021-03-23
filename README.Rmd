@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# stockfish <a href='https://www.curso-r.com/'><img src='man/figures/logo.png' align="right" height="139" /></a>
+# stockfish <a href='https://curso-r.com/'><img src='man/figures/logo.png' align="right" height="139" /></a>
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/stockfish)](https://CRAN.R-project.org/package=stockfish)

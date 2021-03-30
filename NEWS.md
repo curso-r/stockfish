@@ -1,5 +1,7 @@
 # stockfish (development version)
 
+* No need for 'LazyData' anymore.
+
 # stockfish 0.1.1
 
 * Updated compilation on Solaris.

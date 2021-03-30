@@ -5,7 +5,7 @@
 configure_file("src/Makevars.in")
 
 is_solaris <- function() {
-  grepl('SunOS',Sys.info()['sysname'])
+  grepl('SunOS', Sys.info()['sysname'])
 }
 
 if (is_solaris()) {

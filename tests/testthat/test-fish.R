@@ -7,9 +7,11 @@ test_that("engine works", {
   engine <- fish$new()
   expect_true(engine$process$is_alive())
   expect_gt(engine$process$get_pid(), 0)
+  Sys.sleep(1) # Make sure it's done
   expect_true(grepl("Stockfish 11", engine$output))
 
   # Test commands
+  Sys.sleep(1) # Make sure it's done
   expect_true(engine$isready())
   expect_equal(utils::tail(engine$uci(), 1), "uciok")
 

@@ -1,7 +1,7 @@
 # stockfish (development version)
 
 * No need for 'LazyData' anymore.
-* Skip tests on Apple Silicon.
+* Adapt tests for Apple Silicon.
 
 # stockfish 0.1.1
 

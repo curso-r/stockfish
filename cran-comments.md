@@ -11,7 +11,17 @@
 
 * Checking CRAN incoming feasibility ... NOTE
   
-  * Days since last update: 4
+  * New submission
+  
+  * Package was archived on CRAN
+  
+  * Possibly mis-spelled words in DESCRIPTION:
+      UCI (9:39)
+  
+  * CRAN repository db overrides:
+      X-CRAN-Comment: Archived on 2021-04-04 for policy violation.
+      Uses platform-dependent code to skip failing checks instead of
+      correcting them as asked.
 
 * Checking installed package size ... NOTE
 

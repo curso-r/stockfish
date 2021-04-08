@@ -1,5 +1,10 @@
 test_that("engine works", {
 
+  # Detect Mac
+  is_mac <- function() {
+    grepl("Darwin", Sys.info()["sysname"])
+  }
+
   # Find executable
   expect_type(fish_find(), "character")
 
@@ -7,19 +12,19 @@ test_that("engine works", {
   engine <- fish$new()
   expect_true(engine$process$is_alive())
   expect_gt(engine$process$get_pid(), 0)
-  Sys.sleep(1) # Make sure it's done
-  expect_true(is.null(engine$output) || grepl("Stockfish 11", engine$output))
 
-  # Test commands
-  Sys.sleep(1) # Make sure it's done
-  tmp <- engine$isready()
-  expect_true(is.null(tmp) || tmp)
+  # Test startup message (if not on Mac, because it doesn't always show up)
+  if (!is_mac()) {
+    expect_true(grepl("Stockfish 11", engine$output))
+    expect_true(engine$isready())
+  }
+
+  # Test command
   expect_equal(utils::tail(engine$uci(), 1), "uciok")
 
   # Stop engine
   engine$quit()
-  # It might take a sec to quit
-  engine$process$wait(3000)
+  engine$process$wait(3000) # It might take a sec to quit
   expect_false(engine$process$is_alive())
   expect_error(engine$process$get_status())
 

@@ -27,10 +27,20 @@
 
   * Installed size is 6.9Mb
 
-## Justification for installed size
+## Other comments
 
-* This package compiles and installs a binary for the Stockfish engine according
-to the recommendations outlined at
-[Writing R Extensions](https://cran.r-project.org/doc/manuals/R-exts.html#Package-subdirectories).
+* Regarding the installed size: this package compiles and installs a binary for
+Stockfish 11 according to the recommendations outlined at Writing R Extensions.
 Since we shouldn't use any extra flags, the final size of the binary is going to
-be a few Mb.
+be a few Mb, exceeding CRAN's recommended size.
+
+* Regarding copyrights: in order to better preserve authorship of the C++ code,
+all of Stockfish's main authors are now listed as contributors in the
+DESCRIPTION file. Additionally, a "Copyright Notice" section has been added to
+the README.
+
+* Regarding the archival: the last time this package was accepted to CRAN, I was
+notified that it was not passing its checks on M1 Mac. Since I was required to
+fix the problems within two weeks and had no access to an M1 Mac, my only
+possible course of action was skipping the checks on that platform (which is a
+policy violation). This has been fixed and the checks should now pass on M1 Mac.

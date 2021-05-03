@@ -173,7 +173,16 @@ Please note that the `{stockfish}` project is released with a
 [Contributor Code of Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html).
 By contributing to this project, you agree to abide by its terms.
 
-## License
+## Copyright Notice
 
-`{stockfish}` is licensed under the GPL 3 (or any later version at your option).
-Check out [LICENSE.md](https://github.com/curso-r/stockfish/blob/master/LICENSE.md) for the full text.
+The [C++ code](https://github.com/curso-r/stockfish/blob/master/src/) of the
+`{stockfish}` project is derived from
+[Stockfish 11](https://github.com/official-stockfish/Stockfish/tree/c3483fa9a7d7c0ffa9fcc32b467ca844cfb63790),
+and its main authors are listed as contributors in the
+[DESCRIPTION](https://github.com/curso-r/stockfish/blob/master/DESCRIPTION)
+file. For a full list of Stockfish 11's authors, please see their
+[AUTHORS](https://github.com/official-stockfish/Stockfish/blob/c3483fa9a7d7c0ffa9fcc32b467ca844cfb63790/AUTHORS)
+list. Finally, as per Stockfish 11's terms of use, `{stockfish}` is also
+licensed under the GPL 3 (or any later version at your option). Check out
+[LICENSE.md](https://github.com/curso-r/stockfish/blob/master/LICENSE.md) for
+the full text.

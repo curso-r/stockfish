@@ -56,11 +56,11 @@ engine <- fish$new()
 
 # Examine background process
 engine$process
-#> PROCESS 'stockfish', running, pid 173327.
+#> PROCESS 'stockfish', running, pid 176040.
 
 # Search for best move
 engine$go()
-#> [1] "bestmove e2e4 ponder d7d5"
+#> [1] "bestmove d2d4 ponder c7c6"
 
 # Setup a game from FEN
 engine$ucinewgame()
@@ -175,7 +175,7 @@ By contributing to this project, you agree to abide by its terms.
 
 ## Copyright Notice
 
-The [C++ code](https://github.com/curso-r/stockfish/blob/master/src/) of
+The [C++ code](https://github.com/curso-r/stockfish/tree/master/src) of
 the `{stockfish}` project is derived from [Stockfish
 11](https://github.com/official-stockfish/Stockfish/tree/c3483fa9a7d7c0ffa9fcc32b467ca844cfb63790),
 and its main authors are listed as contributors in the

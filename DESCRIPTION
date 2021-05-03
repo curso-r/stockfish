@@ -2,10 +2,22 @@ Package: stockfish
 Title: Analyze Chess Games with the 'Stockfish' Engine
 Version: 0.1.1.9000
 Authors@R: 
-    person(given = "C.",
-           family = "Lente",
-           role = c("aut", "cre"),
-           email = "clente@curso-r.com")
+    c(person(given = "Caio",
+             family = "Lente",
+             role = c("aut", "cre"),
+             email = "clente@curso-r.com"),
+      person(given = "Tord",
+             family = "Romstad",
+             role = "ctb"),
+      person(given = "Marco",
+             family = "Costalba",
+             role = "ctb"),
+      person(given = "Joona",
+             family = "Kiiski",
+             role = "ctb"),
+      person(given = "Gary",
+             family = "Linscott",
+             role = "ctb"))
 Description: An implementation of the UCI open communication protocol that ships
     with 'Stockfish 11' <https://stockfishchess.org/>, a very popular, open
     source, powerful chess engine written in C++.

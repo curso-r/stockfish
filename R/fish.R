@@ -514,6 +514,7 @@ fish_install <- function(path = NULL) {
 
   # Download Stockfish into a temp directory
   temp_dir <- tempdir()
+  on.exit(unlink(temp_dir, recursive = TRUE))
   temp_zip <- file.path(temp_dir, "sf_13.zip")
   utils::download.file(latest, temp_zip)
 
@@ -523,7 +524,7 @@ fish_install <- function(path = NULL) {
   # Build Stockfish (fixed version, for now)
   temp_src <- file.path(temp_dir, "Stockfish-sf_13", "src")
   old <- setwd(dir = temp_src); on.exit(setwd(old))
-  system("make -j build ARCH=general-64")
+  system("make -j build ARCH=x86-64")
 
   # Create data directory
   data_dir <- ifelse(!is.null(path), path, rappdirs::user_data_dir("r-stockfish"))
@@ -533,7 +534,7 @@ fish_install <- function(path = NULL) {
   bin <- list.files(temp_src, pattern = "stockfish")
   file.copy(file.path(temp_src, bin), data_dir, overwrite = TRUE)
 
-  return(list.files(data_dir, "stockfish", full.names = TRUE))
+  return(list.files(data_dir, "stockfish", full.names = TRUE)[1])
 }
 
 # Work around R CMD check issue:

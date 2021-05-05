@@ -306,7 +306,7 @@ inline int popcount(Bitboard b) {
 
 /// lsb() and msb() return the least/most significant bit in a non-zero bitboard
 
-#if defined(__GNUC__)  // GCC, Clang, ICC
+#if defined(__GNUC__) || defined(__sun)  // GCC, Clang, ICC or OSD
 
 inline Square lsb(Bitboard b) {
   assert(b);
@@ -368,15 +368,7 @@ inline Square msb(Bitboard b) {
 
 #else  // Compiler is neither GCC nor MSVC compatible
 
-inline Square lsb(Bitboard b) {
-  assert(b);
-  return Square(__builtin_ctzll(b));
-}
-
-inline Square msb(Bitboard b) {
-  assert(b);
-  return Square(63 ^ __builtin_clzll(b));
-}
+#error "Stockfish requires a GCC or MSVC compatible compiler. Please build from source."
 
 #endif
 

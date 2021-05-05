@@ -4,8 +4,9 @@ CPPFILES=benchmark.cpp bitbase.cpp bitboard.cpp endgame.cpp evaluate.cpp main.cp
 SOURCES=$(CPPFILES)
 OBJECTS=$(CFILES:.c=.o) $(CPPFILES:.cpp=.o)
 PKG_LIBS=-lpthread
+PKG_CXXFLAGS=@COMP_FLAGS@
 
 .PHONY: all
 
 all:
-	$(CXX) $(OBJECTS) -o stockfish $(PKG_LIBS) $(LDFLAGS)
+	$(CXX) $(OBJECTS) -o stockfish $(PKG_CXXFLAGS) $(PKG_LIBS) $(LDFLAGS)

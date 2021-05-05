@@ -510,19 +510,19 @@ fish_find <- function() {
 fish_install <- function(path = NULL) {
 
   # Fixed URL (for now)
-  latest <- "https://github.com/official-stockfish/Stockfish/archive/refs/tags/sf_13.zip"
+  latest <- "https://github.com/official-stockfish/Stockfish/archive/refs/tags/sf_11.zip"
 
   # Download Stockfish into a temp directory
   temp_dir <- tempdir()
   on.exit(unlink(temp_dir, recursive = TRUE))
-  temp_zip <- file.path(temp_dir, "sf_13.zip")
+  temp_zip <- file.path(temp_dir, "sf_11.zip")
   utils::download.file(latest, temp_zip)
 
   # Unzip
   utils::unzip(temp_zip, exdir = temp_dir)
 
   # Build Stockfish (fixed version, for now)
-  temp_src <- file.path(temp_dir, "Stockfish-sf_13", "src")
+  temp_src <- file.path(temp_dir, "Stockfish-sf_11", "src")
   old <- setwd(dir = temp_src); on.exit(setwd(old))
   system("make -j build ARCH=x86-64")
 

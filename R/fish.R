@@ -512,19 +512,29 @@ fish_install <- function(path = NULL) {
   # Fixed URL (for now)
   latest <- "https://github.com/official-stockfish/Stockfish/archive/refs/tags/sf_11.zip"
 
+  # Directory separator
+  sep <- ifelse(grepl("\\\\", rappdirs::user_data_dir("r-stockfish")), "\\", "/")
+
   # Download Stockfish into a temp directory
   temp_dir <- tempdir()
   on.exit(unlink(temp_dir, recursive = TRUE))
-  temp_zip <- file.path(temp_dir, "sf_11.zip")
+  temp_zip <- file.path(temp_dir, "sf_11.zip", fsep = sep)
   utils::download.file(latest, temp_zip)
 
   # Unzip
   utils::unzip(temp_zip, exdir = temp_dir)
 
+  # Find compiler
+  if (Sys.info()["sysname"] == "Darwin") {
+    comp <- "clang++"
+  } else {
+    comp <- "g++"
+  }
+
   # Build Stockfish (fixed version, for now)
-  temp_src <- file.path(temp_dir, "Stockfish-sf_11", "src")
+  temp_src <- file.path(temp_dir, "Stockfish-sf_11", "src", fsep = sep)
   old <- setwd(dir = temp_src); on.exit(setwd(old))
-  system("make -j build ARCH=x86-64")
+  system(paste0("make -j build ARCH=x86-64 COMPCXX=", comp))
 
   # Create data directory
   data_dir <- ifelse(!is.null(path), path, rappdirs::user_data_dir("r-stockfish"))
@@ -532,7 +542,7 @@ fish_install <- function(path = NULL) {
 
   # Copy binary to final location
   bin <- list.files(temp_src, pattern = "stockfish")
-  file.copy(file.path(temp_src, bin), data_dir, overwrite = TRUE)
+  file.copy(file.path(temp_src, bin, fsep = sep), data_dir, overwrite = TRUE)
 
   return(list.files(data_dir, "stockfish", full.names = TRUE)[1])
 }

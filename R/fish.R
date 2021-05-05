@@ -485,7 +485,7 @@ fish <- R6::R6Class(
 fish_find <- function() {
 
   # Find all paths where bin can be (necessary when using load_all())
-  paths <- paste0(.libPaths(), "/stockfish/bin")
+  paths <- system.file("bin", package = "stockfish")
 
   # Select the first valid path and handle Windows architectures
   path <- paths[dir.exists(paths)][1]

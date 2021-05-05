@@ -522,7 +522,8 @@ fish_install <- function(path = NULL) {
 
   # Build Stockfish (fixed version, for now)
   temp_src <- file.path(temp_dir, "Stockfish-sf_13", "src")
-  system(paste("cd", temp_src, "&&", "make -j build"))
+  old <- setwd(dir = temp_src); on.exit(setwd(old))
+  system("make -j build ARCH=general-64")
 
   # Create data directory
   data_dir <- ifelse(!is.null(path), path, rappdirs::user_data_dir("r-stockfish"))

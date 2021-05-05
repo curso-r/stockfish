@@ -1,3 +1,5 @@
+# stockfish (development version)
+
 # stockfish 0.1.2
 
 * Proper copyright notices.

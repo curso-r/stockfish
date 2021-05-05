@@ -289,7 +289,7 @@ public:
     static void unmap(void* baseAddress, uint64_t mapping) {
 
 #ifndef _WIN32
-        munmap(baseAddress, mapping);
+        munmap((char*)baseAddress, mapping);
 #else
         UnmapViewOfFile(baseAddress);
         CloseHandle((HANDLE)mapping);

@@ -190,7 +190,7 @@ const std::string compiler_info() {
      compiler += "(unknown version)";
   #endif
 
-  #if defined(__APPLE__) 
+  #if defined(__APPLE__)
      compiler += " on Apple";
   #elif defined(__CYGWIN__)
      compiler += " on Cygwin";
@@ -265,28 +265,28 @@ void start_logger(const std::string& fname) { Logger::start(fname); }
 /// prefetch() preloads the given address in L1/L2 cache. This is a non-blocking
 /// function that doesn't stall the CPU waiting for data to be loaded from memory,
 /// which can be quite slow.
-#ifdef NO_PREFETCH
+// #ifdef NO_PREFETCH
 
 void prefetch(void*) {}
 
-#else
-
-void prefetch(void* addr) {
-
-#  if defined(__INTEL_COMPILER)
-   // This hack prevents prefetches from being optimized away by
-   // Intel compiler. Both MSVC and gcc seem not be affected by this.
-   __asm__ ("");
-#  endif
-
-#  if defined(__INTEL_COMPILER) || defined(_MSC_VER)
-  _mm_prefetch((char*)addr, _MM_HINT_T0);
-#  else
-  __builtin_prefetch(addr);
-#  endif
-}
-
-#endif
+// #else
+//
+// void prefetch(void* addr) {
+//
+// #  if defined(__INTEL_COMPILER)
+//    // This hack prevents prefetches from being optimized away by
+//    // Intel compiler. Both MSVC and gcc seem not be affected by this.
+//    __asm__ ("");
+// #  endif
+//
+// #  if defined(__INTEL_COMPILER) || defined(_MSC_VER)
+//   _mm_prefetch((char*)addr, _MM_HINT_T0);
+// #  else
+//   __builtin_prefetch(addr);
+// #  endif
+// }
+//
+// #endif
 
 namespace WinProcGroup {
 

@@ -1,3 +1,0 @@
-#! /usr/bin/env sh
-
-rm -f src/stockfish src/*.o src/*.so src/Makevars

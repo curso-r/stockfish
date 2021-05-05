@@ -2,3 +2,4 @@
 
 export(fish)
 export(fish_find)
+export(fish_install)

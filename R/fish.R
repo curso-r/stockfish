@@ -475,7 +475,7 @@ fish <- R6::R6Class(
   )
 )
 
-#' Find bundled Stockfish executable
+#' Find bundled Stockfish executable (and install if necessary)
 #'
 #' This package comes bundled with Stockfish 11, an open source, powerful UCI
 #' chess engine. For more information about what Stockfish is, see the full
@@ -484,18 +484,55 @@ fish <- R6::R6Class(
 #' @export
 fish_find <- function() {
 
-  # Find all paths where bin can be (necessary when using load_all())
-  paths <- paste0(.libPaths(), "/stockfish/bin")
+  # Try to find binary
+  data_dir <- rappdirs::user_data_dir("r-stockfish")
+  file <- list.files(data_dir, "stockfish", full.names = TRUE)
 
-  # Select the first valid path and handle Windows architectures
-  path <- paths[dir.exists(paths)][1]
-  path <- paste0(path, "/", .Platform$r_arch)
-
-  # Find executable and tidy path
-  file <- list.files(path, full.names = TRUE, pattern = "stockfish($|.exe)")
-  file <- gsub("//", "/", file)
+  # Install binary if not found
+  if (length(file) == 0) {
+    message("Installing Stockfish...")
+    file <- fish_install()
+  }
 
   return(file)
+}
+
+#' Install Stockfish executable
+#'
+#' Find, build, and install the latest version of Stockfish, an open source,
+#' powerful UCI chess engine. For more information about what Stockfish is, see
+#' the full documentation of this package by running `?fish`.
+#'
+#' @param path Where to place Stockfish's executable (by default, a folder named
+#' 'r-stockfish' inside [rappdirs::user_data_dir()])
+#'
+#' @export
+fish_install <- function(path = NULL) {
+
+  # Fixed URL (for now)
+  latest <- "https://github.com/official-stockfish/Stockfish/archive/refs/tags/sf_13.zip"
+
+  # Download Stockfish into a temp directory
+  temp_dir <- tempdir()
+  temp_zip <- file.path(temp_dir, "sf_13.zip")
+  utils::download.file(latest, temp_zip)
+
+  # Unzip
+  utils::unzip(temp_zip, exdir = temp_dir)
+
+  # Build Stockfish (fixed version, for now)
+  temp_src <- file.path(temp_dir, "Stockfish-sf_13", "src")
+  system(paste("cd", temp_src, "&&", "make -j build"))
+
+  # Create data directory
+  data_dir <- ifelse(!is.null(path), path, rappdirs::user_data_dir("r-stockfish"))
+  dir.create(data_dir, mode = "755", showWarnings = FALSE, recursive = TRUE)
+
+  # Copy binary to final location
+  bin <- list.files(temp_src, pattern = "stockfish")
+  file.copy(file.path(temp_src, bin), data_dir, overwrite = TRUE)
+
+  return(list.files(data_dir, "stockfish", full.names = TRUE))
 }
 
 # Work around R CMD check issue:

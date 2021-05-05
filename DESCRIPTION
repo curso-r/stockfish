@@ -26,7 +26,8 @@ URL: https://github.com/curso-r/stockfish
 BugReports: https://github.com/curso-r/stockfish/issues
 Imports: 
     processx,
-    R6
+    R6,
+    rappdirs
 Suggests: 
     covr,
     testthat (>= 3.0.0)
@@ -34,4 +35,4 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-SystemRequirements: C++11, and GCC or clang
+SystemRequirements: GNU make

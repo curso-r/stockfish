@@ -2,7 +2,7 @@
 % Please edit documentation in R/fish.R
 \name{fish_find}
 \alias{fish_find}
-\title{Find bundled Stockfish executable (and install if necessary)}
+\title{Find bundled Stockfish executable}
 \usage{
 fish_find()
 }

@@ -1,0 +1,3 @@
+#! /usr/bin/env sh
+
+rm -f src/stockfish.exe src/*.o src/*.so

@@ -475,7 +475,7 @@ fish <- R6::R6Class(
   )
 )
 
-#' Find bundled Stockfish executable (and install if necessary)
+#' Find bundled Stockfish executable
 #'
 #' This package comes bundled with Stockfish 11, an open source, powerful UCI
 #' chess engine. For more information about what Stockfish is, see the full
@@ -484,67 +484,18 @@ fish <- R6::R6Class(
 #' @export
 fish_find <- function() {
 
-  # Try to find binary
-  data_dir <- rappdirs::user_data_dir("r-stockfish")
-  file <- list.files(data_dir, "stockfish", full.names = TRUE)
+  # Find all paths where bin can be (necessary when using load_all())
+  paths <- paste0(.libPaths(), "/stockfish/bin")
 
-  # Install binary if not found
-  if (length(file) == 0) {
-    message("Installing Stockfish...")
-    file <- fish_install()
-  }
+  # Select the first valid path and handle Windows architectures
+  path <- paths[dir.exists(paths)][1]
+  path <- paste0(path, "/", .Platform$r_arch)
+
+  # Find executable and tidy path
+  file <- list.files(path, full.names = TRUE, pattern = "stockfish($|.exe)")
+  file <- gsub("//", "/", file)
 
   return(file)
-}
-
-#' Install Stockfish executable
-#'
-#' Find, build, and install the latest version of Stockfish, an open source,
-#' powerful UCI chess engine. For more information about what Stockfish is, see
-#' the full documentation of this package by running `?fish`.
-#'
-#' @param path Where to place Stockfish's executable (by default, a folder named
-#' 'r-stockfish' inside [rappdirs::user_data_dir()])
-#'
-#' @export
-fish_install <- function(path = NULL) {
-
-  # Fixed URL (for now)
-  latest <- "https://github.com/official-stockfish/Stockfish/archive/refs/tags/sf_11.zip"
-
-  # Directory separator
-  sep <- ifelse(grepl("\\\\", rappdirs::user_data_dir("r-stockfish")), "\\", "/")
-
-  # Download Stockfish into a temp directory
-  temp_dir <- tempdir()
-  on.exit(unlink(temp_dir, recursive = TRUE))
-  temp_zip <- file.path(temp_dir, "sf_11.zip", fsep = sep)
-  utils::download.file(latest, temp_zip)
-
-  # Unzip
-  utils::unzip(temp_zip, exdir = temp_dir)
-
-  # Find compiler
-  if (Sys.info()["sysname"] == "Darwin") {
-    comp <- "clang++"
-  } else {
-    comp <- "g++"
-  }
-
-  # Build Stockfish (fixed version, for now)
-  temp_src <- file.path(temp_dir, "Stockfish-sf_11", "src", fsep = sep)
-  old <- setwd(dir = temp_src); on.exit(setwd(old))
-  system(paste0("make -j build ARCH=x86-64 COMPCXX=", comp))
-
-  # Create data directory
-  data_dir <- ifelse(!is.null(path), path, rappdirs::user_data_dir("r-stockfish"))
-  dir.create(data_dir, mode = "755", showWarnings = FALSE, recursive = TRUE)
-
-  # Copy binary to final location
-  bin <- list.files(temp_src, pattern = "stockfish")
-  file.copy(file.path(temp_src, bin, fsep = sep), data_dir, overwrite = TRUE)
-
-  return(list.files(data_dir, "stockfish", full.names = TRUE)[1])
 }
 
 # Work around R CMD check issue:

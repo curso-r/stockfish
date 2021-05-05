@@ -1,0 +1,4 @@
+stockfish
+Makevars
+*.o
+*.so

@@ -190,7 +190,7 @@ const std::string compiler_info() {
      compiler += "(unknown version)";
   #endif
 
-  #if defined(__APPLE__) 
+  #if defined(__APPLE__)
      compiler += " on Apple";
   #elif defined(__CYGWIN__)
      compiler += " on Cygwin";
@@ -265,7 +265,7 @@ void start_logger(const std::string& fname) { Logger::start(fname); }
 /// prefetch() preloads the given address in L1/L2 cache. This is a non-blocking
 /// function that doesn't stall the CPU waiting for data to be loaded from memory,
 /// which can be quite slow.
-#ifdef NO_PREFETCH
+#if defined(NO_PREFETCH) || defined(__sun)
 
 void prefetch(void*) {}
 

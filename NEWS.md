@@ -1,3 +1,7 @@
+# stockfish (development version)
+
+* Updated code for full Solaris compilation.
+
 # stockfish 0.1.2
 
 * Proper copyright notices.

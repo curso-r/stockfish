@@ -1,5 +1,6 @@
 # stockfish (development version)
 
+* Support for M1 Mac compilation.
 * Updated code for full Solaris compilation.
 
 # stockfish 0.1.2

@@ -19,8 +19,8 @@ Authors@R:
              family = "Linscott",
              role = "ctb"))
 Description: An implementation of the UCI open communication protocol that ships
-    with 'Stockfish 11' <https://stockfishchess.org/>, a very popular, open
-    source, powerful chess engine written in C++.
+    with 'Stockfish' <https://stockfishchess.org/>, a very popular, open source,
+    powerful chess engine written in C++.
 License: GPL (>= 3)
 URL: https://github.com/curso-r/stockfish
 BugReports: https://github.com/curso-r/stockfish/issues

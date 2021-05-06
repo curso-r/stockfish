@@ -21,10 +21,10 @@
 #' administrative privileges to run or even worry about any additional software.
 #'
 #' The only downside is that the bundled version of the engine is Stockfish 11,
-#' not the most recent Stockfish 12. This is because the 12th version needs
-#' additional downloads, which would dramatically increase the installation time.
-#' If you want to, you can [download](https://stockfishchess.org/download/) the
-#' version of your choosing and pass the executable as an argument to
+#' not the most recent release. This is because, since version 12, the engine
+#' needs additional downloads, which would dramatically increase installation
+#' time. If you want to, you can [download](https://stockfishchess.org/download/)
+#' the version of your choosing and pass the executable as an argument to
 #' `fish$new()`.
 #'
 #' @section UCI Protocol:
@@ -477,8 +477,8 @@ fish <- R6::R6Class(
 
 #' Find bundled Stockfish executable
 #'
-#' This package comes bundled with Stockfish 11, an open source, powerful UCI
-#' chess engine. For more information about what Stockfish is, see the full
+#' This package comes bundled with Stockfish, an open source, powerful UCI chess
+#' engine. For more information about what Stockfish is, see the full
 #' documentation of this package by running `?fish`.
 #'
 #' @export

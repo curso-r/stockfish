@@ -30,7 +30,7 @@
 ## Other comments
 
 * Regarding the installed size: this package compiles and installs a binary for
-Stockfish 11 according to the recommendations outlined at Writing R Extensions.
+Stockfish according to the recommendations outlined at Writing R Extensions.
 Since we shouldn't use any extra flags, the final size of the binary is going to
 be a few Mb, exceeding CRAN's recommended size.
 

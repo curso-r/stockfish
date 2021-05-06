@@ -18,9 +18,9 @@ maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lif
 
 `{stockfish}` is an R package that implements the
 [UCI](http://wbec-ridderkerk.nl/html/UCIProtocol.html) open
-communication protocol and ships with [Stockfish
-11](https://github.com/official-stockfish/Stockfish), a very popular,
-open source, powerful chess engine written in C++.
+communication protocol and ships with
+[Stockfish](https://github.com/official-stockfish/Stockfish), a very
+popular, open source, powerful chess engine written in C++.
 
 ## Installation
 
@@ -56,11 +56,11 @@ engine <- fish$new()
 
 # Examine background process
 engine$process
-#> PROCESS 'stockfish', running, pid 176040.
+#> PROCESS 'stockfish', running, pid 391365.
 
 # Search for best move
 engine$go()
-#> [1] "bestmove d2d4 ponder c7c6"
+#> [1] "bestmove e2e4 ponder d7d5"
 
 # Setup a game from FEN
 engine$ucinewgame()
@@ -96,8 +96,8 @@ give it administrative privileges to run or even worry about any
 additional software.
 
 The only downside is that the bundled version of the engine is Stockfish
-11, not the most recent Stockfish 12. This is because the 12th version
-needs additional downloads, which would dramatically increase the
+11, not the most recent release. This is because, since version 12, the
+engine needs additional downloads, which would dramatically increase
 installation time. If you want to, you can
 [download](https://stockfishchess.org/download/) the version of your
 choosing and pass the executable as an argument to `fish$new()`.
@@ -182,7 +182,7 @@ and its main authors are listed as contributors in the
 [DESCRIPTION](https://github.com/curso-r/stockfish/blob/master/DESCRIPTION)
 file. For a full list of Stockfish 11’s authors, please see their
 [AUTHORS](https://github.com/official-stockfish/Stockfish/blob/c3483fa9a7d7c0ffa9fcc32b467ca844cfb63790/AUTHORS)
-list. Finally, as per Stockfish 11’s terms of use, `{stockfish}` is also
+list. Finally, as per Stockfish’s terms of use, `{stockfish}` is also
 licensed under the GPL 3 (or any later version at your option). Check
 out
 [LICENSE.md](https://github.com/curso-r/stockfish/blob/master/LICENSE.md)

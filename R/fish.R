@@ -484,8 +484,12 @@ fish <- R6::R6Class(
 #' @export
 fish_find <- function() {
 
-  # Find bin (necessary when using load_all())
-  path <- file.path(rappdirs::user_data_dir("r-stockfish"), "bin")
+  # Find all paths where bin can be (necessary when using load_all())
+  paths <- paste0(.libPaths(), "/stockfish/bin")
+
+  # Select the first valid path and handle Windows architectures
+  path <- paths[dir.exists(paths)][1]
+  path <- paste0(path, "/", .Platform$r_arch)
 
   # Find executable and tidy path
   file <- list.files(path, full.names = TRUE, pattern = "stockfish($|.exe)")

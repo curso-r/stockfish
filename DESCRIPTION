@@ -2,7 +2,7 @@ Package: stockfish
 Title: Analyze Chess Games with the 'Stockfish' Engine
 Version: 0.1.2.9000
 Authors@R: 
-    c(person(given = "Caio",
+    c(person(given = "C.",
              family = "Lente",
              role = c("aut", "cre"),
              email = "clente@curso-r.com"),

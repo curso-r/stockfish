@@ -6,12 +6,9 @@ name: Check
 
 # When to run
 on:
-  push:
-    branches-ignore:
-      - gh-pages
-  pull_request:
-    branches-ignore:
-      - gh-pages
+  create:
+    tags:
+      - v*
 
 # Run R-CMD-check in multiple platforms
 jobs:

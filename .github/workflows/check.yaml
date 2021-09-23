@@ -23,10 +23,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-16.04]
+        os: [macos-latest, windows-latest, ubuntu-18.04]
         r: ['oldrel', 'release']
         include:
-          - os: ubuntu-16.04
+          - os: ubuntu-18.04
             r: 'devel'
 
     env:

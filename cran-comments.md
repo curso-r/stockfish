@@ -1,9 +1,11 @@
 ## Test environments
 
-* GitHub Actions (ubuntu-16.04): devel, release, oldrel
+* GitHub Actions (ubuntu-18.04): devel, release, oldrel
 * GitHub Actions (windows): release, oldrel
 * GitHub Actions (macOS): release, oldrel
+* Vagrant VM (windows 2022 preview): devel
 * win-builder: devel
+* mac-builder: release
 
 ## R CMD check results
 

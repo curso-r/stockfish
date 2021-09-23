@@ -9,7 +9,8 @@ test_that("engine works", {
   expect_gt(engine$process$get_pid(), 0)
 
   # Test startup message
-  expect_true(engine$isready())
+  engine$isready()
+  expect_true(any(engine$log == "readyok"))
 
   # Test command
   expect_equal(utils::tail(engine$uci(), 1), "uciok")

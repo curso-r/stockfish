@@ -56,18 +56,15 @@ engine <- fish$new()
 
 # Examine background process
 engine$process
-#> PROCESS 'stockfish', running, pid 391365.
-
+#> PROCESS 'stockfish', running, pid 31756.
 # Search for best move
 engine$go()
-#> [1] "bestmove e2e4 ponder d7d5"
-
+#> [1] "bestmove d2d4 ponder c7c6"
 # Setup a game from FEN
 engine$ucinewgame()
 engine$position("6rk/2Q3p1/5qBp/5P2/8/7P/6PK/8 w - - 15 51")
 engine$go()
 #> [1] "bestmove g6f7 ponder g8d8"
-
 # Stop the engine
 engine$quit()
 ```

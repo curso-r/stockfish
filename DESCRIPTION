@@ -1,6 +1,6 @@
 Package: stockfish
 Title: Analyze Chess Games with the 'Stockfish' Engine
-Version: 0.1.3
+Version: 0.1.3.9000
 Authors@R: 
     c(person(given = "Caio",
              family = "Lente",

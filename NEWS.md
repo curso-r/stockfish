@@ -1,3 +1,5 @@
+# stockfish (development version)
+
 # stockfish 0.1.3
 
 * Generalized tests on M1 Mac.

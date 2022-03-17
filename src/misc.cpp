@@ -1,8 +1,6 @@
 /*
   Stockfish, a UCI chess playing engine derived from Glaurung 2.1
-  Copyright (C) 2004-2008 Tord Romstad (Glaurung author)
-  Copyright (C) 2008-2015 Marco Costalba, Joona Kiiski, Tord Romstad
-  Copyright (C) 2015-2020 Marco Costalba, Joona Kiiski, Gary Linscott, Tord Romstad
+  Copyright (C) 2004-2021 The Stockfish developers (see AUTHORS file)
 
   Stockfish is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -46,17 +44,30 @@ typedef bool(*fun3_t)(HANDLE, CONST GROUP_AFFINITY*, PGROUP_AFFINITY);
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <cstdlib>
+
+#if defined(__linux__) && !defined(__ANDROID__)
+#include <stdlib.h>
+#include <sys/mman.h>
+#endif
+
+#if defined(__APPLE__) || defined(__ANDROID__) || defined(__OpenBSD__) || (defined(__GLIBCXX__) && !defined(_GLIBCXX_HAVE_ALIGNED_ALLOC) && !defined(_WIN32)) || defined(__e2k__)
+#define POSIXALIGNEDALLOC
+#include <stdlib.h>
+#endif
 
 #include "misc.h"
 #include "thread.h"
 
 using namespace std;
 
+namespace Stockfish {
+
 namespace {
 
 /// Version number. If Version is left empty, then compile date in the format
 /// DD-MM-YY and show in engine_info.
-const string Version = "11";
+const string Version = "14.1";
 
 /// Our fancy logging facility. The trick here is to replace cin.rdbuf() and
 /// cout.rdbuf() with two Tie objects that tie cin and cout to a file stream. We
@@ -99,7 +110,14 @@ public:
 
     static Logger l;
 
-    if (!fname.empty() && !l.file.is_open())
+    if (l.file.is_open())
+    {
+        cout.rdbuf(l.out.buf);
+        cin.rdbuf(l.in.buf);
+        l.file.close();
+    }
+
+    if (!fname.empty())
     {
         l.file.open(fname, ifstream::out);
 
@@ -112,23 +130,18 @@ public:
         cin.rdbuf(&l.in);
         cout.rdbuf(&l.out);
     }
-    else if (fname.empty() && l.file.is_open())
-    {
-        cout.rdbuf(l.out.buf);
-        cin.rdbuf(l.in.buf);
-        l.file.close();
-    }
   }
 };
 
 } // namespace
+
 
 /// engine_info() returns the full name of the current Stockfish version. This
 /// will be either "Stockfish <Tag> DD-MM-YY" (where DD-MM-YY is the date when
 /// the program was compiled) or "Stockfish <Version>", depending on whether
 /// Version is empty.
 
-const string engine_info(bool to_uci) {
+string engine_info(bool to_uci) {
 
   const string months("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec");
   string month, day, year;
@@ -142,10 +155,8 @@ const string engine_info(bool to_uci) {
       ss << setw(2) << day << setw(2) << (1 + months.find(month) / 4) << year.substr(2);
   }
 
-  ss << (Is64Bit ? " 64" : "")
-     << (HasPext ? " BMI2" : (HasPopCnt ? " POPCNT" : ""))
-     << (to_uci  ? "\nid author ": " by ")
-     << "T. Romstad, M. Costalba, J. Kiiski, G. Linscott";
+  ss << (to_uci  ? "\nid author ": " by ")
+     << "the Stockfish developers (see AUTHORS file)";
 
   return ss.str();
 }
@@ -153,11 +164,11 @@ const string engine_info(bool to_uci) {
 
 /// compiler_info() returns a string trying to describe the compiler we use
 
-const std::string compiler_info() {
+std::string compiler_info() {
 
-  #define STRINGIFY2(x) #x
-  #define STRINGIFY(x) STRINGIFY2(x)
-  #define VER_STRING(major, minor, patch) STRINGIFY(major) "." STRINGIFY(minor) "." STRINGIFY(patch)
+  #define stringify2(x) #x
+  #define stringify(x) stringify2(x)
+  #define make_version_string(major, minor, patch) stringify(major) "." stringify(minor) "." stringify(patch)
 
 /// Predefined macros hell:
 ///
@@ -171,20 +182,32 @@ const std::string compiler_info() {
 
   #ifdef __clang__
      compiler += "clang++ ";
-     compiler += VER_STRING(__clang_major__, __clang_minor__, __clang_patchlevel__);
+     compiler += make_version_string(__clang_major__, __clang_minor__, __clang_patchlevel__);
   #elif __INTEL_COMPILER
      compiler += "Intel compiler ";
      compiler += "(version ";
-     compiler += STRINGIFY(__INTEL_COMPILER) " update " STRINGIFY(__INTEL_COMPILER_UPDATE);
+     compiler += stringify(__INTEL_COMPILER) " update " stringify(__INTEL_COMPILER_UPDATE);
      compiler += ")";
   #elif _MSC_VER
      compiler += "MSVC ";
      compiler += "(version ";
-     compiler += STRINGIFY(_MSC_FULL_VER) "." STRINGIFY(_MSC_BUILD);
+     compiler += stringify(_MSC_FULL_VER) "." stringify(_MSC_BUILD);
+     compiler += ")";
+  #elif defined(__e2k__) && defined(__LCC__)
+    #define dot_ver2(n) \
+      compiler += (char)'.'; \
+      compiler += (char)('0' + (n) / 10); \
+      compiler += (char)('0' + (n) % 10);
+
+     compiler += "MCST LCC ";
+     compiler += "(version ";
+     compiler += std::to_string(__LCC__ / 100);
+     dot_ver2(__LCC__ % 100)
+     dot_ver2(__LCC_MINOR__)
      compiler += ")";
   #elif __GNUC__
      compiler += "g++ (GNUC) ";
-     compiler += VER_STRING(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+     compiler += make_version_string(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
   #else
      compiler += "Unknown compiler ";
      compiler += "(unknown version)";
@@ -210,7 +233,40 @@ const std::string compiler_info() {
      compiler += " on unknown system";
   #endif
 
-  compiler += "\n __VERSION__ macro expands to: ";
+  compiler += "\nCompilation settings include: ";
+  compiler += (Is64Bit ? " 64bit" : " 32bit");
+  #if defined(USE_VNNI)
+    compiler += " VNNI";
+  #endif
+  #if defined(USE_AVX512)
+    compiler += " AVX512";
+  #endif
+  compiler += (HasPext ? " BMI2" : "");
+  #if defined(USE_AVX2)
+    compiler += " AVX2";
+  #endif
+  #if defined(USE_SSE41)
+    compiler += " SSE41";
+  #endif
+  #if defined(USE_SSSE3)
+    compiler += " SSSE3";
+  #endif
+  #if defined(USE_SSE2)
+    compiler += " SSE2";
+  #endif
+  compiler += (HasPopCnt ? " POPCNT" : "");
+  #if defined(USE_MMX)
+    compiler += " MMX";
+  #endif
+  #if defined(USE_NEON)
+    compiler += " NEON";
+  #endif
+
+  #if !defined(NDEBUG)
+    compiler += " DEBUG";
+  #endif
+
+  compiler += "\n__VERSION__ macro expands to: ";
   #ifdef __VERSION__
      compiler += __VERSION__;
   #else
@@ -265,7 +321,7 @@ void start_logger(const std::string& fname) { Logger::start(fname); }
 /// prefetch() preloads the given address in L1/L2 cache. This is a non-blocking
 /// function that doesn't stall the CPU waiting for data to be loaded from memory,
 /// which can be quite slow.
-#if defined(NO_PREFETCH) || defined(__sun)
+#ifdef NO_PREFETCH
 
 void prefetch(void*) {}
 
@@ -287,6 +343,149 @@ void prefetch(void* addr) {
 }
 
 #endif
+
+
+/// std_aligned_alloc() is our wrapper for systems where the c++17 implementation
+/// does not guarantee the availability of aligned_alloc(). Memory allocated with
+/// std_aligned_alloc() must be freed with std_aligned_free().
+
+void* std_aligned_alloc(size_t alignment, size_t size) {
+
+#if defined(POSIXALIGNEDALLOC)
+  void *mem;
+  return posix_memalign(&mem, alignment, size) ? nullptr : mem;
+#elif defined(_WIN32)
+  return _mm_malloc(size, alignment);
+#else
+  return std::aligned_alloc(alignment, size);
+#endif
+}
+
+void std_aligned_free(void* ptr) {
+
+#if defined(POSIXALIGNEDALLOC)
+  free(ptr);
+#elif defined(_WIN32)
+  _mm_free(ptr);
+#else
+  free(ptr);
+#endif
+}
+
+/// aligned_large_pages_alloc() will return suitably aligned memory, if possible using large pages.
+
+#if defined(_WIN32)
+
+static void* aligned_large_pages_alloc_windows(size_t allocSize) {
+
+  #if !defined(_WIN64)
+    (void)allocSize; // suppress unused-parameter compiler warning
+    return nullptr;
+  #else
+
+  HANDLE hProcessToken { };
+  LUID luid { };
+  void* mem = nullptr;
+
+  const size_t largePageSize = GetLargePageMinimum();
+  if (!largePageSize)
+      return nullptr;
+
+  // We need SeLockMemoryPrivilege, so try to enable it for the process
+  if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hProcessToken))
+      return nullptr;
+
+  if (LookupPrivilegeValue(NULL, SE_LOCK_MEMORY_NAME, &luid))
+  {
+      TOKEN_PRIVILEGES tp { };
+      TOKEN_PRIVILEGES prevTp { };
+      DWORD prevTpLen = 0;
+
+      tp.PrivilegeCount = 1;
+      tp.Privileges[0].Luid = luid;
+      tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+      // Try to enable SeLockMemoryPrivilege. Note that even if AdjustTokenPrivileges() succeeds,
+      // we still need to query GetLastError() to ensure that the privileges were actually obtained.
+      if (AdjustTokenPrivileges(
+              hProcessToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), &prevTp, &prevTpLen) &&
+          GetLastError() == ERROR_SUCCESS)
+      {
+          // Round up size to full pages and allocate
+          allocSize = (allocSize + largePageSize - 1) & ~size_t(largePageSize - 1);
+          mem = VirtualAlloc(
+              NULL, allocSize, MEM_RESERVE | MEM_COMMIT | MEM_LARGE_PAGES, PAGE_READWRITE);
+
+          // Privilege no longer needed, restore previous state
+          AdjustTokenPrivileges(hProcessToken, FALSE, &prevTp, 0, NULL, NULL);
+      }
+  }
+
+  CloseHandle(hProcessToken);
+
+  return mem;
+
+  #endif
+}
+
+void* aligned_large_pages_alloc(size_t allocSize) {
+
+  // Try to allocate large pages
+  void* mem = aligned_large_pages_alloc_windows(allocSize);
+
+  // Fall back to regular, page aligned, allocation if necessary
+  if (!mem)
+      mem = VirtualAlloc(NULL, allocSize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+
+  return mem;
+}
+
+#else
+
+void* aligned_large_pages_alloc(size_t allocSize) {
+
+#if defined(__linux__)
+  constexpr size_t alignment = 2 * 1024 * 1024; // assumed 2MB page size
+#else
+  constexpr size_t alignment = 4096; // assumed small page size
+#endif
+
+  // round up to multiples of alignment
+  size_t size = ((allocSize + alignment - 1) / alignment) * alignment;
+  void *mem = std_aligned_alloc(alignment, size);
+#if defined(MADV_HUGEPAGE)
+  madvise(mem, size, MADV_HUGEPAGE);
+#endif
+  return mem;
+}
+
+#endif
+
+
+/// aligned_large_pages_free() will free the previously allocated ttmem
+
+#if defined(_WIN32)
+
+void aligned_large_pages_free(void* mem) {
+
+  if (mem && !VirtualFree(mem, 0, MEM_RELEASE))
+  {
+      DWORD err = GetLastError();
+      std::cerr << "Failed to free large page memory. Error code: 0x"
+                << std::hex << err
+                << std::dec << std::endl;
+      exit(EXIT_FAILURE);
+  }
+}
+
+#else
+
+void aligned_large_pages_free(void *mem) {
+  std_aligned_free(mem);
+}
+
+#endif
+
 
 namespace WinProcGroup {
 
@@ -393,3 +592,62 @@ void bindThisThread(size_t idx) {
 #endif
 
 } // namespace WinProcGroup
+
+#ifdef _WIN32
+#include <direct.h>
+#define GETCWD _getcwd
+#else
+#include <unistd.h>
+#define GETCWD getcwd
+#endif
+
+namespace CommandLine {
+
+string argv0;            // path+name of the executable binary, as given by argv[0]
+string binaryDirectory;  // path of the executable directory
+string workingDirectory; // path of the working directory
+
+void init(int argc, char* argv[]) {
+    (void)argc;
+    string pathSeparator;
+
+    // extract the path+name of the executable binary
+    argv0 = argv[0];
+
+#ifdef _WIN32
+    pathSeparator = "\\";
+  #ifdef _MSC_VER
+    // Under windows argv[0] may not have the extension. Also _get_pgmptr() had
+    // issues in some windows 10 versions, so check returned values carefully.
+    char* pgmptr = nullptr;
+    if (!_get_pgmptr(&pgmptr) && pgmptr != nullptr && *pgmptr)
+        argv0 = pgmptr;
+  #endif
+#else
+    pathSeparator = "/";
+#endif
+
+    // extract the working directory
+    workingDirectory = "";
+    char buff[40000];
+    char* cwd = GETCWD(buff, 40000);
+    if (cwd)
+        workingDirectory = cwd;
+
+    // extract the binary directory path from argv0
+    binaryDirectory = argv0;
+    size_t pos = binaryDirectory.find_last_of("\\/");
+    if (pos == std::string::npos)
+        binaryDirectory = "." + pathSeparator;
+    else
+        binaryDirectory.resize(pos + 1);
+
+    // pattern replacement: "./" at the start of path is replaced by the working directory
+    if (binaryDirectory.find("." + pathSeparator) == 0)
+        binaryDirectory.replace(0, 1, workingDirectory);
+}
+
+
+} // namespace CommandLine
+
+} // namespace Stockfish

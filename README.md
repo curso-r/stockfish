@@ -37,7 +37,7 @@ remotes::install_github("curso-r/stockfish")
 ```
 
 You can also find more (and more recent) versions of the Stockfish
-engine to use with `{stockfish}`at their [download
+engine to use with `{stockfish}` at their [download
 page](https://stockfishchess.org/download/).
 
 ## Example
@@ -54,15 +54,18 @@ engine <- fish$new()
 
 # Examine background process
 engine$process
-#> PROCESS 'stockfish', running, pid 36703.
+#> PROCESS 'stockfish', running, pid 49842.
+
 # Search for best move
 engine$go()
-#> [1] "bestmove d2d4 ponder c7c6"
+#> [1] "info depth 14 seldepth 19 multipv 1 score cp 56 nodes 420525 nps 274673 hashfull 184 tbhits 0 time 1531 pv e2e4 e7e5 g1f3 g8f6 d2d4 f6e4 f3e5 d8e7 d1e2 e4f6 e5f3 b8c6 e2e7 f8e7"
+
 # Setup a game from FEN
 engine$ucinewgame()
 engine$position("6rk/2Q3p1/5qBp/5P2/8/7P/6PK/8 w - - 15 51")
 engine$go()
-#> [1] "bestmove g6f7 ponder g8d8"
+#> [1] "info depth 17 currmove d2d4 currmovenumber 4"
+
 # Stop the engine
 engine$quit()
 ```
@@ -81,7 +84,7 @@ For more information, see its full documentation by running `?fish`.
 This package comes bundled with
 [Stockfish](https://github.com/official-stockfish/Stockfish), a very
 popular, open source, powerful chess engine written in C++. It can
-achieve an ELO of 3516, runs on Windows, macOS, Linux, iOS and Android,
+achieve an ELO of 3544, runs on Windows, macOS, Linux, iOS and Android,
 and can be compiled in less than a minute.
 
 When installing `{stockfish}` (lower case), Stockfish’s (upper case)
@@ -90,12 +93,22 @@ R packages. This is not a system-wide installation! You don’t have to
 give it administrative privileges to run or even worry about any
 additional software.
 
-The only downside is that the bundled version of the engine is Stockfish
-11, not the most recent release. This is because, since version 12, the
-engine needs additional downloads, which would dramatically increase
-installation time. If you want to, you can
-[download](https://stockfishchess.org/download/) the version of your
-choosing and pass the executable as an argument to `fish$new()`.
+But there are two main downsides:
+
+1.  While the bundled version of the engine (Stockfish 14.1) is
+    up-to-date as of March 2022, it isn’t able to update itself. This
+    means that, if I’m not able to port an upcomming version of
+    Stockfish, the package will stay behind. Luckly, you can always
+    [download](https://stockfishchess.org/download/) the version of your
+    choosing and pass the executable as an argument to `fish$new()`.
+
+2.  Since version 12, Stockfish supports [NNUE
+    evaluation](https://github.com/official-stockfish/Stockfish#a-note-on-classical-evaluation-versus-nnue-evaluation),
+    but this requires some pretty heavy binaries. In order to avoid
+    bundling large files with `{stockfish}`, **I have decided to disable
+    NNUE** in the source code. Again, you are free to
+    [download](https://stockfishchess.org/download/) a NNUE-capable
+    version and use it instead of the bundled executable.
 
 ### UCI Protocol
 
@@ -142,9 +155,9 @@ documentation](http://wbec-ridderkerk.nl/html/UCIProtocol.html)), but
 here are a few things to look out for:
 
 -   Not every UCI method is implemented: since `{stockfish}` was made
-    with Stockfish (and mainly Stockfish 11) in mind, a couple of UCI
-    methods that don’t work with the engine were not implemented. They
-    are `debug()` and `register()`.
+    with Stockfish in mind, a couple of UCI methods that don’t work with
+    the engine were not implemented. They are `debug()` and
+    `register()`.
 
 -   Most methods return silently: since most UCI commands don’t output
     anything or output boilerplate text, most methods return silently.
@@ -153,9 +166,9 @@ here are a few things to look out for:
 
 -   Not every Stockfish option will work: at least when using the
     bundled version of Stockfish, not every documented option will work
-    with `setoption()`. This happens because, as described above, this
-    package comes with Stockfish 11, which is not the most recent
-    version. Options that will not work are labeled with an asterisk.
+    with `setoption()`. This happens because, as described above, the
+    bundled version has some limitations. Options that will not work are
+    labeled with an asterisk.
 
 -   Times are in milliseconds: unlike most R functions, every method
     that takes a time interval expects them in milliseconds, not
@@ -172,11 +185,11 @@ By contributing to this project, you agree to abide by its terms.
 
 The [C++ code](https://github.com/curso-r/stockfish/tree/master/src) of
 the `{stockfish}` project is derived from [Stockfish
-11](https://github.com/official-stockfish/Stockfish/tree/c3483fa9a7d7c0ffa9fcc32b467ca844cfb63790),
+14.1](https://github.com/official-stockfish/Stockfish/releases/tag/sf_14.1),
 and its main authors are listed as contributors in the
 [DESCRIPTION](https://github.com/curso-r/stockfish/blob/master/DESCRIPTION)
-file. For a full list of Stockfish 11’s authors, please see their
-[AUTHORS](https://github.com/official-stockfish/Stockfish/blob/c3483fa9a7d7c0ffa9fcc32b467ca844cfb63790/AUTHORS)
+file. For a full list of Stockfish 14.1’s authors, please see their
+[AUTHORS](https://github.com/official-stockfish/Stockfish/blob/7262fd5d14810b7b495b5038e348a448fda1bcc3/AUTHORS)
 list. Finally, as per Stockfish’s terms of use, `{stockfish}` is also
 licensed under the GPL 3 (or any later version at your option). Check
 out

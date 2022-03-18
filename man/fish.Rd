@@ -8,15 +8,13 @@ This class represents a Stockfish engine, allowing the user to
 send commands and receive outputs according to the UCI protocol. In short, a
 \code{fish} object, when created, spawns a detached Stockfish process and pipes
 into its stdin and stdout.
-
-For more information, see the full documentation by running \code{?fish}.
 }
 \section{Bundled Stockfish}{
 
 This package comes bundled with
 \href{https://github.com/official-stockfish/Stockfish}{Stockfish}, a very popular,
 open source, powerful chess engine written in C++. It can achieve an ELO of
-3516, runs on Windows, macOS, Linux, iOS and Android, and can be compiled in
+3544, runs on Windows, macOS, Linux, iOS and Android, and can be compiled in
 less than a minute.
 
 When installing \code{{stockfish}} (lower case), Stockfish's (upper case) source
@@ -24,12 +22,19 @@ code is compiled and the resulting executable is stored with your R packages.
 This is not a system-wide installation! You don't have to give it
 administrative privileges to run or even worry about any additional software.
 
-The only downside is that the bundled version of the engine is Stockfish 11,
-not the most recent release. This is because, since version 12, the engine
-needs additional downloads, which would dramatically increase installation
-time. If you want to, you can \href{https://stockfishchess.org/download/}{download}
-the version of your choosing and pass the executable as an argument to
-\code{fish$new()}.
+But there are two main downsides:
+\itemize{
+\item While the bundled version of the engine (Stockfish 14.1) is up-to-date as
+of March 2022, it isn't able to update itself. This means that, if I'm not
+able to port an upcomming version of Stockfish, the package will stay
+behind. Luckly, you can always download the version of your choosing and
+pass the executable as an argument to \code{new()}.
+\item Since version 12, Stockfish supports NNUE evaluation but this requires
+some pretty heavy binaries. In order to avoid bundling large files with
+\code{{stockfish}}, \strong{I have decided to disable NNUE} in the source code.
+Again, you are free to download a NNUE-capable version and use it instead
+of the bundled executable.
+}
 }
 
 \section{UCI Protocol}{
@@ -78,18 +83,17 @@ means a comprehensive list (and you should probably read
 here are a few things to look out for:
 \itemize{
 \item Not every UCI method is implemented: since \code{{stockfish}} was made with
-Stockfish (and mainly Stockfish 11) in mind, a couple of UCI methods that
-don't work with the engine were not implemented. They are \code{debug()} and
-\code{register()}.
+Stockfish in mind, a couple of UCI methods that don't work with the engine
+were not implemented. They are \code{debug()} and \code{register()}.
 \item Most methods return silently: since most UCI commands don't output anything
-or output boilerplate text, most methods of this class return silently. The
-exceptions are \code{run()}, \code{isready()}, \code{go()} and \code{stop()}; you can see exactly
-what they return by reading their documentations.
+or output boilerplate text, most methods return silently. The
+exceptions are \code{run()}, \code{isready()}, \code{go()} and \code{stop()}; you can see
+exactly what they return by reading their documentations.
 \item Not every Stockfish option will work: at least when using the bundled
-version of Stockfish, not every documented option will work with \code{setoption()}.
-This happens because, as described above, this package comes with Stockfish
-11, which is not the most recent version. Options that will not work are
-labeled with an asterisk.
+version of Stockfish, not every documented option will work with
+\code{setoption()}. This happens because, as described above, the bundled
+version has some limitations. Options that will not work are labeled with
+an asterisk.
 \item Times are in milliseconds: unlike most R functions, every method that takes
 a time interval expects them in milliseconds, not seconds.
 }
@@ -226,71 +230,68 @@ Boolean indicating whether the output is exactly \code{"readyok"}
 \subsection{Method \code{setoption()}}{
 Change the internal parameters of the engine. All currently
 supported options (according to Stockfish's documentation) are listed
-below, but note that \strong{those marked with an * require Stockfish 12} to
-work):
+below, but note that \strong{those marked with an * will not work} with the
+buldled version:
 \itemize{
-\item \code{Threads}: the number of CPU threads used for searching a position. For
+\item \code{Threads}: The number of CPU threads used for searching a position. For
 best performance, set this equal to the number of CPU cores available.
-\item \code{Hash}: the size of the hash table in MB. It is recommended to set Hash
+\item \code{Hash}: The size of the hash table in MB. It is recommended to set Hash
 after setting Threads.
-\item \code{Ponder}: let Stockfish ponder its next move while the opponent is
+\item \verb{Clear Hash}: Clear the hash table.
+\item \code{Ponder}: Let Stockfish ponder its next move while the opponent is
 thinking.
-\item \code{MultiPV}: output the N best lines (principal variations, PVs) when
+\item \code{MultiPV}: Output the N best lines (principal variations, PVs) when
 searching. Leave at 1 for best performance.
-\item \verb{Use NNUE}*: toggle between the NNUE and classical evaluation functions.
-If set to "true", the network parameters must be available to load from
-file (see also EvalFile), if they are not embedded in the binary.
-\item \code{EvalFile}*: the name of the file of the NNUE evaluation parameters.
-Depending on the GUI the filename might have to include the full path to
-the folder/directory that contains the file. Other locations, such as the
-directory that contains the binary and the working directory, are also
-searched.
-\item \code{UCI_AnalyseMode}: an option handled by your GUI.
-\item \code{UCI_Chess960}: an option handled by your GUI. If true, Stockfish will
+\item \verb{Use NNUE}*: Toggle between the NNUE and classical evaluation
+functions. If set to "true", the network parameters must be available
+to load from file (see also EvalFile), if they are not embedded in the
+binary.
+\item \code{EvalFile}*: The name of the file of the NNUE evaluation parameters.
+Depending on the GUI the filename might have to include the full path
+to the folder/directory that contains the file. Other locations, such
+as the directory that contains the binary and the working directory,
+are also searched.
+\item \code{UCI_AnalyseMode}: An option handled by your GUI.
+\item \code{UCI_Chess960}: An option handled by your GUI. If true, Stockfish will
 play Chess960.
-\item \code{UCI_ShowWDL}*: tf enabled, show approximate WDL statistics as part of
+\item \code{UCI_ShowWDL}: If enabled, show approximate WDL statistics as part of
 the engine output. These WDL numbers model expected game outcomes for a
 given evaluation and game ply for engine self-play at fishtest LTC
 conditions (60+0.6s per game).
-\item \code{UCI_LimitStrength}*: enable weaker play aiming for an Elo rating as set
+\item \code{UCI_LimitStrength}: Enable weaker play aiming for an Elo rating as set
 by UCI_Elo. This option overrides Skill Level.
-\item \code{UCI_Elo}*: if enabled by UCI_LimitStrength, aim for an engine strength
-of the given Elo. This Elo rating has been calibrated at a time control of
-60s+0.6s and anchored to CCRL 40/4.
-\item \verb{Skill Level}: lower the Skill Level in order to make Stockfish play
-weaker (see also UCI_LimitStrength). Internally, MultiPV is enabled, and
-with a certain probability depending on the Skill Level a weaker move
-will be played.
-\item \code{SyzygyPath}: path to the folders/directories storing the Syzygy
+\item \code{UCI_Elo}: If enabled by UCI_LimitStrength, aim for an engine strength
+of the given Elo. This Elo rating has been calibrated at a time control
+of 60s+0.6s and anchored to CCRL 40/4.
+\item \verb{Skill Level}: Lower the Skill Level in order to make Stockfish play
+weaker (see also UCI_LimitStrength). Internally, MultiPV is enabled,
+and with a certain probability depending on the Skill Level a weaker
+move will be played.
+\item \code{SyzygyPath}: Path to the folders/directories storing the Syzygy
 tablebase files. Multiple directories are to be separated by ";" on
 Windows and by ":" on Unix-based operating systems. Do not use spaces
 around the ";" or ":". Example:
-\verb{C:\\tablebases\\wdl345;C:\\tablebases\\wdl6;D:\\tablebases\\dtz345;D:\\tablebases\\dtz6}.
+\verb{C:\\tablebases\\wdl345;C:\\tablebases\\wdl6;D:\\tablebases\\dtz345;D:\\tablebases\\dtz6}. #nolint
 It is recommended to store .rtbw files on an SSD. There is no loss in
-storing the .rtbz files on a regular HD. It is recommended to verify all
-md5 checksums of the downloaded tablebase files (\verb{md5sum -c checksum.md5})
-as corruption will lead to engine crashes.
-\item \code{SyzygyProbeDepth}: minimum remaining search depth for which a position
+storing the .rtbz files on a regular HDD. It is recommended to verify
+all md5 checksums of the downloaded tablebase files
+(\verb{md5sum -c checksum.md5}) as corruption will lead to engine crashes.
+\item \code{SyzygyProbeDepth}: Minimum remaining search depth for which a position
 is probed. Set this option to a higher value to probe less aggressively
-if you experience too much slowdown (in terms of nps) due to TB probing.
-\item \code{Syzygy50MoveRule}: disable to let fifty-move rule draws detected by
-Syzygy tablebase probes count as wins or losses. This is useful for ICCF
-correspondence games.
-\item \code{SyzygyProbeLimit}: limit Syzygy tablebase probing to positions with at
+if you experience too much slowdown (in terms of nps) due to tablebase
+probing.
+\item \code{Syzygy50MoveRule}: Disable to let fifty-move rule draws detected by
+Syzygy tablebase probes count as wins or losses. This is useful for
+ICCF correspondence games.
+\item \code{SyzygyProbeLimit}: Limit Syzygy tablebase probing to positions with at
 most this many pieces left (including kings and pawns).
-\item \code{Contempt}: a positive value for contempt favors middle game positions
-and avoids draws, effective for the classical evaluation only.
-\item \verb{Analysis Contempt}: by default, contempt is set to prefer the side to
-move. Set this option to "White" or "Black" to analyse with contempt for
-that side, or "Off" to disable contempt.
-\item \verb{Move Overhead}: assume a time delay of x ms due to network and GUI
+\item \verb{Move Overhead}: Assume a time delay of x ms due to network and GUI
 overheads. This is useful to avoid losses on time in those cases.
-\item \verb{Slow Mover}: lower values will make Stockfish take less time in games,
+\item \verb{Slow Mover}: Lower values will make Stockfish take less time in games,
 higher values will make it think longer.
-\item \code{nodestime}: tells the engine to use nodes searched instead of wall time
-to account for elapsed time. Useful for engine testing.
-\item \verb{Clear Hash}: clear the hash table.
-\item \verb{Debug Log File}: write all communication to and from the engine into a
+\item \code{nodestime}: Tells the engine to use nodes searched instead of wall
+time to account for elapsed time. Useful for engine testing.
+\item \verb{Debug Log File}: Write all communication to and from the engine into a
 text file.
 }
 
@@ -354,12 +355,12 @@ Set up the position on the internal board. When passing a
 sequence of moves, use long algebraic notation (LAN) as described in the
 UCI Protocol section of this documentation.
 
-"Set up the position described in fenstring on the internal board and play
-the moves on the internal chess board. if the game was played  from the
-start position the string 'startpos' will be sent. Note: no 'new' command
-is needed. However, if this position is from a different game than the
-last position sent to the engine, the GUI should have sent a 'ucinewgame'
-inbetween."
+"Set up the position described in fenstring on the internal board and
+play the moves on the internal chess board. if the game was played from
+the start position the string 'startpos' will be sent. Note: no 'new'
+command is needed. However, if this position is from a different game
+than the last position sent to the engine, the GUI should have sent a
+'ucinewgame' inbetween."
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{fish$position(position = NULL, type = c("fen", "startpos"))}\if{html}{\out{</div>}}
 }
@@ -390,21 +391,21 @@ should be interpreted as it would not influence the search.
 'position startpos' and 'go infinite searchmoves e2e4 d2d4' the engine
 should only search the two moves e2e4 and d2d4 in the initial position.
 \item \code{ponder}: start searching in pondering mode. Do not exit the search in
-ponder mode, even if it's mate! This means that the last move sent in the
-position string is the ponder move. The engine can do what it wants to
-do, but after a 'ponderhit' command it should execute the suggested move
-to ponder on. This means that the ponder move sent by the GUI can be
-interpreted as a recommendation about which move to ponder. However, if
-the engine decides to ponder on a different move, it should not display
-any mainlines as they are likely to be misinterpreted by the GUI because
-the GUI expects the engine to ponder on the suggested move.
+ponder mode, even if it's mate! This means that the last move sent in
+the position string is the ponder move. The engine can do what it wants
+to do, but after a 'ponderhit' command it should execute the suggested
+move to ponder on. This means that the ponder move sent by the GUI can
+be interpreted as a recommendation about which move to ponder. However,
+if the engine decides to ponder on a different move, it should not
+display any mainlines as they are likely to be misinterpreted by the
+GUI because the GUI expects the engine to ponder on the suggested move.
 \item \code{wtime}: white has x msec left on the clock.
 \item \code{btime}: black has x msec left on the clock.
 \item \code{winc}: white increment per move in mseconds if x > 0.
 \item \code{binc}: black increment per move in mseconds if x > 0.
 \item \code{movestogo}: there are x moves to the next time control, this will only
-be sent if x > 0, if you don't get this and get the wtime and btime it's
-sudden death.
+be sent if x > 0, if you don't get this and get the wtime and btime
+it's sudden death.
 \item \code{depth}: search x plies only.
 \item \code{nodes}: search x nodes only.
 \item \code{mate}: search for a mate in x moves.
@@ -463,7 +464,8 @@ issued (makes function return instantly without any output)}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A string with result of the search or \code{NULL} if \code{infinite == TRUE}
+A string with result of the search or \code{NULL} if
+\code{infinite == TRUE}
 }
 }
 \if{html}{\out{<hr>}}

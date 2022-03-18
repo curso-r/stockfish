@@ -1,5 +1,6 @@
 # stockfish (development version)
 
+* Update documentation to reflect Stockfish 14.1.
 * Bundle Stockfish 14.1.
 * New system requirement: C++17.
 

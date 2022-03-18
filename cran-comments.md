@@ -1,11 +1,10 @@
 ## Test environments
 
-* GitHub Actions (ubuntu-18.04): devel, release, oldrel
-* GitHub Actions (windows): release, oldrel
-* GitHub Actions (macos): release, oldrel
-* Vagrant VM (windows 2022 preview): devel
-* win-builder: devel
-* mac-builder: release
+* Local (macos m1): release
+* GitHub Actions (ubuntu-20.04): devel, release, oldrel
+* GitHub Actions (windows): release
+* GitHub Actions (macos): release
+* win-builder (windows): devel
 
 ## R CMD check results
 
@@ -13,7 +12,7 @@
 
 * Checking installed package size ... NOTE
 
-  * Installed size is 7.6Mb
+  * Installed size is 9.3Mb
 
 ## Other comments
 

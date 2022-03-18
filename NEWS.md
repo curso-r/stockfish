@@ -1,5 +1,8 @@
 # stockfish (development version)
 
+* Bundle Stockfish 14.1.
+* New system requirement: C++17.
+
 # stockfish 0.1.3
 
 * Generalized tests on M1 Mac.

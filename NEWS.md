@@ -1,4 +1,4 @@
-# stockfish (development version)
+# stockfish 1.0.0
 
 * Update documentation to reflect Stockfish 14.1.
 * Bundle Stockfish 14.1.

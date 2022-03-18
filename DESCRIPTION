@@ -1,6 +1,6 @@
 Package: stockfish
 Title: Analyze Chess Games with the 'Stockfish' Engine
-Version: 0.1.3.9000
+Version: 1.0.0
 Authors@R: c(
     person("Caio", "Lente", , "clente@curso-r.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8473-069X")),

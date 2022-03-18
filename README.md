@@ -8,7 +8,7 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/stockfish)](https://CRAN.R-project.org/package=stockfish)
 [![Codecov test
-coverage](https://codecov.io/gh/curso-r/stockfish/branch/master/graph/badge.svg)](https://codecov.io/gh/curso-r/stockfish?branch=master)
+coverage](https://codecov.io/gh/curso-r/stockfish/branch/master/graph/badge.svg)](https://app.codecov.io/gh/curso-r/stockfish?branch=master)
 [![R-CMD-check](https://github.com/curso-r/stockfish/workflows/R-CMD-check/badge.svg)](https://github.com/curso-r/stockfish/actions)
 <!-- badges: end -->
 
@@ -54,17 +54,17 @@ engine <- fish$new()
 
 # Examine background process
 engine$process
-#> PROCESS 'stockfish', running, pid 49842.
+#> PROCESS 'stockfish', running, pid 51774.
 
 # Search for best move
 engine$go()
-#> [1] "info depth 14 seldepth 19 multipv 1 score cp 56 nodes 420525 nps 274673 hashfull 184 tbhits 0 time 1531 pv e2e4 e7e5 g1f3 g8f6 d2d4 f6e4 f3e5 d8e7 d1e2 e4f6 e5f3 b8c6 e2e7 f8e7"
+#> [1] "info depth 10 seldepth 10 multipv 1 score cp 69 nodes 42240 nps 276078 tbhits 0 time 153 pv e2e4 b8c6 d2d4 d7d5 e4e5 e7e6 g1f3 g8e7 b1c3 h7h6"
 
 # Setup a game from FEN
 engine$ucinewgame()
 engine$position("6rk/2Q3p1/5qBp/5P2/8/7P/6PK/8 w - - 15 51")
 engine$go()
-#> [1] "info depth 17 currmove d2d4 currmovenumber 4"
+#> [1] "info depth 15 seldepth 18 multipv 1 score cp 53 nodes 585935 nps 264053 hashfull 259 tbhits 0 time 2219 pv e2e4 e7e5 b1c3 g8f6 g1f3 b8c6 f1c4 f6e4 c3e4 d7d5 c4d3 d5e4 d3e4 f8c5 e1g1"
 
 # Stop the engine
 engine$quit()

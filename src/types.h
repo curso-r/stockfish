@@ -267,22 +267,6 @@ enum Rank : int {
   RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NB
 };
 
-// Keep track of what a move changes on the board (used by NNUE)
-struct DirtyPiece {
-
-  // Number of changed pieces
-  int dirty_num;
-
-  // Max 3 pieces can change in one move. A promotion with capture moves
-  // both the pawn and the captured piece to SQ_NONE and the piece promoted
-  // to from SQ_NONE to the capture square.
-  Piece piece[3];
-
-  // From and to squares, which may be SQ_NONE
-  Square from[3];
-  Square to[3];
-};
-
 /// Score enum stores a middlegame and an endgame value in a single integer (enum).
 /// The least significant 16 bits are used to store the middlegame value and the
 /// upper 16 bits are used to store the endgame value. We have to take care to
